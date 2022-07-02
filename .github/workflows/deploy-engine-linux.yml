@@ -33,3 +33,4 @@ jobs:
         name: Linux Binaries
         path: |
           build/*.so
+          build/hlds_linux
