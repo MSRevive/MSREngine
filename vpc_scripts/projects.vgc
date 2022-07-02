@@ -1,0 +1,29 @@
+//-----------------------------------------------------------------------------
+//	PROJECTS.VGC
+//
+//	Project Configurations for all Source(TM) Projects
+//-----------------------------------------------------------------------------
+
+/////////////////////////
+// Project definitions //
+/////////////////////////
+
+$Project "hlds"
+{
+	"dedicated\dedicated.vpc"
+}
+
+$Project "filesystem_stdio"
+{
+	"filesystem\filesystem.vpc"
+}
+
+$Project "bzip2"
+{
+	"utils\bzip2\bzip2.vpc" [$WIN32]
+}
+
+$Project "ReHLDS"
+{
+	"rehlds\rehlds.vpc"
+}

@@ -1,0 +1,99 @@
+//-----------------------------------------------------------------------------
+//	bzip2.VPC
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$macro SRCDIR		"..\.."
+$include "$SRCDIR\vpc_scripts\source_lib_base.vpc"
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;../"
+		$PreprocessorDefinitions		"$BASE;"
+		$EnableC++Exceptions			"Yes (/EHsc)"
+	}
+}
+
+$Project "bzip2"
+{
+	$Folder	"Source Files"
+	{
+		$File "bzlib.c"
+		{
+			$Configuration
+			{
+				$Compiler
+				{
+					$CompileAs							"Compile as C Code (/TC)"
+				}
+			}
+		}
+		$File "blocksort.c"
+		{
+			$Configuration
+			{
+				$Compiler
+				{
+					$CompileAs							"Compile as C Code (/TC)"
+				}
+			}
+		}
+		$File "compress.c"
+		{
+			$Configuration
+			{
+				$Compiler
+				{
+					$CompileAs							"Compile as C Code (/TC)"
+				}
+			}
+		}
+		$File "crctable.c"
+		{
+			$Configuration
+			{
+				$Compiler
+				{
+					$CompileAs							"Compile as C Code (/TC)"
+				}
+			}
+		}
+		$File "huffman.c"
+		{
+			$Configuration
+			{
+				$Compiler
+				{
+					$CompileAs							"Compile as C Code (/TC)"
+				}
+			}
+		}
+		$File "randtable.c"
+		{
+			$Configuration
+			{
+				$Compiler
+				{
+					$CompileAs							"Compile as C Code (/TC)"
+				}
+			}
+		}
+		$File "decompress.c"
+		{
+			$Configuration
+			{
+				$Compiler
+				{
+					$CompileAs							"Compile as C Code (/TC)"
+				}
+			}
+		}		
+	}
+
+	$Folder	"Header Files"
+	{
+		$File "bzlib_private.h"
+	}
+}

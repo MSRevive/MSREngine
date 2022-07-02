@@ -1,0 +1,81 @@
+//-----------------------------------------------------------------------------
+//	DEDICATED.VPC - HLDS Launcher
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		".."
+$Macro OUTBINNAME	"hlds" [$WIN32]
+$Macro OUTBINNAME	"hlds_linux" [$POSIX]
+$Macro OUTBINDIR	"$SRCDIR\build"
+
+$Include "$SRCDIR\vpc_scripts\source_exe_base.vpc"
+
+$Configuration
+{	
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR;$SRCDIR\dedicated;$SRCDIR\common;$SRCDIR\engine;$SRCDIR\public;$SRCDIR\public\rehlds"
+		$PreprocessorDefinitions		"$BASE;LAUNCHER_FIXES;DEDICATED;_CRT_SECURE_NO_WARNINGS;USE_BREAKPAD_HANDLER;_CONSOLE;NDEBUG" [$WIN32]
+		$PreprocessorDefinitions		"$BASE;_stricmp=strcasecmp;_strnicmp=strncasecmp;_strdup=strdup;_vsnprintf=vsnprintf;_GLIBCXX_USE_CXX11_ABI=0" [$POSIX]
+		$EnableC++Exceptions			"Yes (/EHsc)"
+	}
+
+	$Linker
+	{
+		$AdditionalDependencies				"$BASE ws2_32.lib winmm.lib" [$WIN32]
+	}
+}
+
+$Project "hlds"
+{
+	$Folder	"Source Files"
+	{
+		$Folder	"common"
+		{			
+			$File "$SRCDIR\common\minidump.cpp"
+			$File "$SRCDIR\common\minidump.h"
+			$File "$SRCDIR\common\ObjectList.cpp"
+			$File "$SRCDIR\common\ObjectList.h"
+			$File "$SRCDIR\common\SteamAppStartUp.cpp"
+			$File "$SRCDIR\common\SteamAppStartUp.h"
+			$File "$SRCDIR\common\textconsole.cpp"
+			$File "$SRCDIR\common\textconsole.h"
+			$File "$SRCDIR\common\TextConsoleUnix.cpp" [$POSIX]
+			$File "$SRCDIR\common\TextConsoleUnix.h" [$POSIX]
+			$File "$SRCDIR\common\TextConsoleWin32.cpp" [$WIN32]
+			$File "$SRCDIR\common\TextConsoleWin32.h" [$WIN32]
+		}
+
+		$Folder	"engine"
+		{
+			$File "$SRCDIR\engine\mem.cpp"
+		}
+		
+		$Folder	"vgui"
+		{
+			$File "vguihelpers.cpp"
+			$File "vguihelpers.h"			
+		}		
+
+		$File "$SRCDIR\common\commandline.cpp"
+		$File "conproc.cpp" [$WIN32]
+		$File "conproc.h" [$WIN32]
+		$File "dedicated.h"
+		$File "dedicated_exports.cpp"
+		$File "public_amalgamation.cpp"
+		$File "sys_window.cpp" [$WIN32]
+		$File "sys_linux.cpp" [$POSIX]
+		$File "dbg.cpp" [$POSIX]		
+		$File "sys_ded.cpp"
+		$File "sys_ded.h"		
+		$File "precompiled.h"
+	}
+	
+	$Folder	"Resources" [$WIN32]
+	{
+		$File "dedicated.rc"
+		$File "icon.ico"
+		$File "resource.h"
+
+	}
+}

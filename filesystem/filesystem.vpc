@@ -1,0 +1,71 @@
+//-----------------------------------------------------------------------------
+//	FILESYSTEM.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		".."
+$Macro OUTBINNAME	"filesystem_stdio"
+$Macro OUTBINDIR	"$SRCDIR\build"
+
+$include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+$Configuration	"Debug"
+{
+	$General
+	{
+		$OutputDirectory		".\Debug"			[$WIN32]
+		$IntermediateDirectory	".\Debug"			[$WIN32]
+	}
+}
+
+$Configuration	"Release"
+{
+	$General
+	{
+		$OutputDirectory		".\Release"		[$WIN32]
+		$IntermediateDirectory	".\Release"		[$WIN32]
+	}
+}
+
+$Configuration
+{
+	$General
+	{
+	}
+	
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR;$SRCDIR\filesystem;$SRCDIR\common;$SRCDIR\public;$SRCDIR\public\rehlds"
+		$PreprocessorDefinitions		"$BASE;_CRT_SECURE_NO_WARNINGS;USE_BREAKPAD_HANDLER;NDEBUG" [$WIN32]
+		$PreprocessorDefinitions		"$BASE;_GLIBCXX_USE_CXX11_ABI=0;_strdup=strdup;_stricmp=strcasecmp;_strnicmp=strncasecmp;_vsnprintf=vsnprintf;_snprintf=snprintf;_unlink=unlink" [$POSIX]
+		$EnableC++Exceptions			"Yes (/EHsc)"
+	}
+
+	$Linker
+	{
+		$AdditionalDependencies			"$BASE psapi.lib" [$WIN32]
+	}
+}
+
+$Project "filesystem"
+{
+	$Folder	"Source Files"
+	{
+		$File "BaseFileSystem.cpp"
+		$File "filesystem_helpers.cpp"
+		$File "FileSystem_Stdio.cpp"
+		$File "linux_support.cpp" [$POSIX]
+		$File "pathmatch.cpp" [$POSIX]
+		$File "public_amalgamation.cpp"
+	}
+	
+	$Folder	"Header Files"
+	{
+		$File "BaseFileSystem.h"
+		$File "filesystem_helpers.h"
+		$File "FileSystem_Stdio.h"
+		$File "linux_support.h" [$POSIX]
+		$File "precompiled.h"
+	}
+}

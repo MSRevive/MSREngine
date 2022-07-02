@@ -1,0 +1,420 @@
+//-----------------------------------------------------------------------------
+//	REHLDS.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		".."
+$Macro OUTBINNAME	"swds" [$WIN32]
+$Macro OUTBINNAME	"engine_i486" [$POSIX]
+$Macro OUTBINDIR	"$SRCDIR\build"
+
+$include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+$Configuration	"Debug"
+{
+	$General
+	{
+		$OutputDirectory		".\Debug"			[$WIN32]
+		$IntermediateDirectory	".\Debug"			[$WIN32]
+	}
+}
+
+$Configuration	"Release"
+{
+	$General
+	{
+		$OutputDirectory		".\Release"		[$WIN32]
+		$IntermediateDirectory	".\Release"		[$WIN32]
+	}
+}
+
+$Configuration
+{
+	$General
+	{
+	}
+	
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR;$SRCDIR\rehlds;$SRCDIR\common;$SRCDIR\public;$SRCDIR\engine;$SRCDIR\movement;$SRCDIR\public\rehlds;$SRCDIR\utils"
+		$PreprocessorDefinitions		"$BASE;REHLDS_API;REHLDS_FIXES;REHLDS_SSE;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS" [$WIN32]
+		$PreprocessorDefinitions		"$BASE;SWDS;REHLDS_JIT;REHLDS_SSE;REHLDS_FIXES;REHLDS_CHECKS;REHLDS_API;REHLDS_SELF;REHLDS_OPT_PEDANTIC;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;_GLIBCXX_USE_CXX11_ABI=0;_stricmp=strcasecmp;_strnicmp=strncasecmp;_strdup=strdup;_unlink=unlink;_vsnprintf=vsnprintf;_vsnwprintf=vswprintf" [$POSIX]
+		$EnableC++Exceptions			"Yes (/EHsc)"
+	}
+
+	$Linker
+	{
+		$AdditionalDependencies			"$BASE psapi.lib ws2_32.lib" [$WIN32]
+	}
+}
+
+$Project "ReHLDS"
+{
+	$Folder	"Source Files"
+	{
+		$Folder	"common"
+		{
+			$File "$SRCDIR\common\BaseSystemModule.cpp"
+			$File "$SRCDIR\common\ObjectList.cpp"
+			$File "$SRCDIR\common\TokenLine.cpp"
+			$File "$SRCDIR\common\beamdef.h"
+			$File "$SRCDIR\common\cl_entity.h"
+			$File "$SRCDIR\common\com_model.h"
+			$File "$SRCDIR\common\const.h"
+			$File "$SRCDIR\common\con_nprint.h"
+			$File "$SRCDIR\common\crc.h"
+			$File "$SRCDIR\common\md5.h"
+			$File "$SRCDIR\common\cvardef.h"
+			$File "$SRCDIR\common\demo_api.h"
+			$File "$SRCDIR\common\director_cmds.h"
+			$File "$SRCDIR\common\dlight.h"
+			$File "$SRCDIR\common\dll_state.h"
+			$File "$SRCDIR\common\entity_state.h"
+			$File "$SRCDIR\common\entity_types.h"
+			$File "$SRCDIR\common\enums.h"
+			$File "$SRCDIR\common\event_api.h"
+			$File "$SRCDIR\common\event_args.h"
+			$File "$SRCDIR\common\event_flags.h"
+			$File "$SRCDIR\common\hltv.h"
+			$File "$SRCDIR\common\IGameServerData.h"
+			$File "$SRCDIR\common\in_buttons.h"
+			$File "$SRCDIR\common\ivoicetweak.h"
+			$File "$SRCDIR\common\kbutton.h"
+			$File "$SRCDIR\common\mathlib.h"
+			$File "$SRCDIR\common\netadr.h"
+			$File "$SRCDIR\common\net_api.h"
+			$File "$SRCDIR\common\nowin.h"
+			$File "$SRCDIR\common\parsemsg.h"
+			$File "$SRCDIR\common\particledef.h"
+			$File "$SRCDIR\common\pmtrace.h"
+			$File "$SRCDIR\common\port.h"
+			$File "$SRCDIR\common\qfont.h"
+			$File "$SRCDIR\common\qlimits.h"
+			$File "$SRCDIR\common\quakedef.h"
+			$File "$SRCDIR\common\ref_params.h"
+			$File "$SRCDIR\common\r_efx.h"
+			$File "$SRCDIR\common\r_studioint.h"
+			$File "$SRCDIR\common\screenfade.h"
+			$File "$SRCDIR\common\Sequence.h"
+			$File "$SRCDIR\common\SteamCommon.h"
+			$File "$SRCDIR\common\studio_event.h"
+			$File "$SRCDIR\common\triangleapi.h"
+			$File "$SRCDIR\common\usercmd.h"
+			$File "$SRCDIR\common\vmodes.h"
+			$File "$SRCDIR\common\weaponinfo.h"
+			$File "$SRCDIR\common\winsani_in.h"
+			$File "$SRCDIR\common\winsani_out.h"
+		}
+		
+		$Folder	"dlls"
+		{
+			$File "$SRCDIR\dlls\activity.h"
+			$File "$SRCDIR\dlls\activitymap.h"
+			$File "$SRCDIR\dlls\animation.h"
+			$File "$SRCDIR\dlls\basemonster.h"
+			$File "$SRCDIR\dlls\cbase.h"
+			$File "$SRCDIR\dlls\cdll_dll.h"
+			$File "$SRCDIR\dlls\client.h"
+			$File "$SRCDIR\dlls\decals.h"
+			$File "$SRCDIR\dlls\doors.h"
+			$File "$SRCDIR\dlls\effects.h"
+			$File "$SRCDIR\dlls\enginecallback.h"
+			$File "$SRCDIR\dlls\explode.h"
+			$File "$SRCDIR\dlls\extdll.h"
+			$File "$SRCDIR\dlls\func_break.h"
+			$File "$SRCDIR\dlls\game.h"
+			$File "$SRCDIR\dlls\gamerules.h"
+			$File "$SRCDIR\dlls\hornet.h"
+			$File "$SRCDIR\dlls\items.h"
+			$File "$SRCDIR\dlls\maprules.h"
+			$File "$SRCDIR\dlls\monsterevent.h"
+			$File "$SRCDIR\dlls\monsters.h"
+			$File "$SRCDIR\dlls\nodes.h"
+			$File "$SRCDIR\dlls\plane.h"
+			$File "$SRCDIR\dlls\player.h"
+			$File "$SRCDIR\dlls\saverestore.h"
+			$File "$SRCDIR\dlls\schedule.h"
+			$File "$SRCDIR\dlls\scriptevent.h"
+			$File "$SRCDIR\dlls\skill.h"
+			$File "$SRCDIR\dlls\soundent.h"
+			$File "$SRCDIR\dlls\spectator.h"
+			$File "$SRCDIR\dlls\talkmonster.h"
+			$File "$SRCDIR\dlls\teamplay_gamerules.h"
+			$File "$SRCDIR\dlls\trains.h"
+			$File "$SRCDIR\dlls\util.h"
+			$File "$SRCDIR\dlls\vector.h"
+			$File "$SRCDIR\dlls\weapons.h"
+		}
+		
+		$Folder	"engine"
+		{
+			$Folder	"client"
+			{
+				$File "$SRCDIR\engine\APIProxy.h"
+				$File "$SRCDIR\engine\cdll_int.h"
+				$File "$SRCDIR\engine\client.h"
+				$File "$SRCDIR\engine\sound.h"
+				$File "$SRCDIR\engine\delta_packet.h"
+			}
+			
+			$Folder	"server"
+			{			
+				$File "$SRCDIR\engine\sv_log.cpp"
+				$File "$SRCDIR\engine\sv_main.cpp"
+				$File "$SRCDIR\engine\sv_move.cpp"
+				$File "$SRCDIR\engine\sv_phys.cpp"
+				$File "$SRCDIR\engine\sv_pmove.cpp"
+				$File "$SRCDIR\engine\sv_remoteaccess.cpp"
+				$File "$SRCDIR\engine\sv_steam3.cpp"
+				$File "$SRCDIR\engine\sv_upld.cpp"
+				$File "$SRCDIR\engine\sv_user.cpp"
+				$File "$SRCDIR\engine\sys_dll2.cpp"
+				$File "$SRCDIR\engine\sys_dll2.h"
+				$File "$SRCDIR\engine\cl_null.cpp"
+				$File "$SRCDIR\engine\vid_null.cpp"
+				$File "$SRCDIR\engine\sv_log.h"
+				$File "$SRCDIR\engine\sv_move.h"
+				$File "$SRCDIR\engine\sv_phys.h"
+				$File "$SRCDIR\engine\sv_pmove.h"
+				$File "$SRCDIR\engine\sv_remoteaccess.h"
+				$File "$SRCDIR\engine\sv_steam3.h"
+				$File "$SRCDIR\engine\sv_upld.h"
+				$File "$SRCDIR\engine\sv_user.h"
+			}
+
+			$Folder	"common"
+			{
+				$File "$SRCDIR\engine\buildnum.cpp"		
+				$File "$SRCDIR\engine\cmd.cpp"
+				$File "$SRCDIR\engine\cmodel.cpp"
+				$File "$SRCDIR\engine\common.cpp"
+				$File "$SRCDIR\engine\com_custom.cpp"
+				$File "$SRCDIR\engine\crc.cpp"
+				$File "$SRCDIR\engine\cvar.cpp"
+				$File "$SRCDIR\engine\decals.cpp"
+				$File "$SRCDIR\engine\delta.cpp"
+				$File "$SRCDIR\engine\delta_jit.cpp"
+				$File "$SRCDIR\engine\ed_strpool.cpp"
+				$File "$SRCDIR\engine\filesystem.cpp"
+				$File "$SRCDIR\engine\filesystem_internal.cpp"
+				$File "$SRCDIR\engine\hashpak.cpp"
+				$File "$SRCDIR\engine\host.cpp"
+				$File "$SRCDIR\engine\host_cmd.cpp"
+				$File "$SRCDIR\engine\info.cpp"
+				$File "$SRCDIR\engine\ipratelimit.cpp"
+				$File "$SRCDIR\engine\l_studio.cpp"
+				$File "$SRCDIR\engine\md5.cpp"
+				$File "$SRCDIR\engine\mem.cpp"
+				$File "$SRCDIR\engine\model.cpp"
+				$File "$SRCDIR\engine\module.cpp"
+				$File "$SRCDIR\engine\net_chan.cpp"
+				$File "$SRCDIR\engine\net_ws.cpp"
+				$File "$SRCDIR\engine\pmove.cpp"
+				$File "$SRCDIR\engine\pmovetst.cpp"
+				$File "$SRCDIR\engine\pr_cmds.cpp"
+				$File "$SRCDIR\engine\pr_edict.cpp"	
+				$File "$SRCDIR\engine\r_studio.cpp"
+				$File "$SRCDIR\engine\snd_null.cpp"	
+				$File "$SRCDIR\engine\SystemWrapper.cpp"
+				$File "$SRCDIR\engine\sys_dll.cpp"			
+				$File "$SRCDIR\engine\sys_engine.cpp"
+				$File "$SRCDIR\engine\sys_linuxwind.cpp"
+				$File "$SRCDIR\engine\textures.cpp"
+				$File "$SRCDIR\engine\tmessage.cpp"
+				$File "$SRCDIR\engine\traceinit.cpp"
+				$File "$SRCDIR\engine\unicode_strtools.cpp"			
+				$File "$SRCDIR\engine\wad.cpp"
+				$File "$SRCDIR\engine\world.cpp"
+				$File "$SRCDIR\engine\zone.cpp"
+				$File "$SRCDIR\engine\cmd.h"
+				$File "$SRCDIR\engine\cmodel.h"
+				$File "$SRCDIR\engine\common.h"
+				$File "$SRCDIR\engine\com_custom.h"
+				$File "$SRCDIR\engine\consistency.h"
+				$File "$SRCDIR\engine\custom_int.h"
+				$File "$SRCDIR\engine\cvar.h"
+				$File "$SRCDIR\engine\decal.h"
+				$File "$SRCDIR\engine\delta.h"
+				$File "$SRCDIR\engine\delta_jit.h"				
+				$File "$SRCDIR\engine\ed_strpool.h"
+				$File "$SRCDIR\engine\event.h"
+				$File "$SRCDIR\engine\filesystem_.h"
+				$File "$SRCDIR\engine\filesystem_internal.h"
+				$File "$SRCDIR\engine\filter.h"
+				$File "$SRCDIR\engine\hashpak.h"
+				$File "$SRCDIR\engine\host.h"
+				$File "$SRCDIR\engine\host_cmd.h"
+				$File "$SRCDIR\engine\igame.h"
+				$File "$SRCDIR\engine\info.h"
+				$File "$SRCDIR\engine\inst_baseline.h"
+				$File "$SRCDIR\engine\ipratelimit.h"
+				$File "$SRCDIR\engine\keys.h"
+				$File "$SRCDIR\engine\l_studio.h"
+				$File "$SRCDIR\engine\mem.h"
+				$File "$SRCDIR\engine\model_rehlds.h"
+				$File "$SRCDIR\engine\modinfo.h"
+				$File "$SRCDIR\engine\net.h"
+				$File "$SRCDIR\engine\net_chan.h"
+				$File "$SRCDIR\engine\net_ws.h"
+				$File "$SRCDIR\engine\pmove.h"
+				$File "$SRCDIR\engine\pmovetst.h"
+				$File "$SRCDIR\engine\pr_cmds.h"
+				$File "$SRCDIR\engine\pr_edict.h"
+				$File "$SRCDIR\engine\server.h"
+				$File "$SRCDIR\engine\server_static.h"
+				$File "$SRCDIR\engine\studio_rehlds.h"
+				$File "$SRCDIR\engine\SystemWrapper.h"
+				$File "$SRCDIR\engine\sys_dll.h"				
+				$File "$SRCDIR\engine\iengine.h"
+				$File "$SRCDIR\engine\sys_engine.h"
+				$File "$SRCDIR\engine\sys_linuxwnd.h"
+				$File "$SRCDIR\engine\textures.h"
+				$File "$SRCDIR\engine\tmessage.h"
+				$File "$SRCDIR\engine\traceinit.h"
+				$File "$SRCDIR\engine\unicode_strtools.h"
+				$File "$SRCDIR\engine\userid.h"
+				$File "$SRCDIR\engine\usermsg.h"
+				$File "$SRCDIR\engine\vid_null.h"
+				$File "$SRCDIR\engine\wad.h"
+				$File "$SRCDIR\engine\world.h"
+				$File "$SRCDIR\engine\zone.h"
+			}
+
+			$File "$SRCDIR\engine\mathlib_e.h"
+			$File "$SRCDIR\engine\mathlib_sse.h"
+			$File "$SRCDIR\engine\mathlib.cpp"
+			$File "$SRCDIR\engine\mathlib_sse.cpp"
+			$File "$SRCDIR\engine\sse_mathfun.cpp"
+			$File "$SRCDIR\engine\sse_mathfun.h"
+			$File "$SRCDIR\engine\public_amalgamation.cpp"
+		}
+
+		$Folder	"public"
+		{
+			$Folder	"rehlds"
+			{
+				//$File "$SRCDIR\public\rehlds\crc32c.cpp" [$POSIX]
+				//$File "$SRCDIR\public\rehlds\sys_shared.cpp" [$POSIX]
+				$File "$SRCDIR\public\rehlds\archtypes.h"
+				$File "$SRCDIR\public\rehlds\bspfile.h"
+				$File "$SRCDIR\public\rehlds\cmd_rehlds.h"
+				$File "$SRCDIR\public\rehlds\common_rehlds.h"
+				$File "$SRCDIR\public\rehlds\crc32c.h"
+				$File "$SRCDIR\public\rehlds\custom.h"
+				$File "$SRCDIR\public\rehlds\customentity.h"
+				$File "$SRCDIR\public\rehlds\d_local.h"
+				$File "$SRCDIR\public\rehlds\edict.h"
+				$File "$SRCDIR\public\rehlds\eiface.h"
+				$File "$SRCDIR\public\rehlds\FlightRecorder.h"
+				$File "$SRCDIR\public\rehlds\hookchains.h"
+				$File "$SRCDIR\public\rehlds\keydefs.h"
+				$File "$SRCDIR\public\rehlds\maintypes.h"
+				$File "$SRCDIR\public\rehlds\model.h"
+				$File "$SRCDIR\public\rehlds\modelgen.h"
+				$File "$SRCDIR\public\rehlds\osconfig.h"
+				$File "$SRCDIR\public\rehlds\progdefs.h"
+				$File "$SRCDIR\public\rehlds\progs.h"
+				$File "$SRCDIR\public\rehlds\rehlds_api.h"
+				$File "$SRCDIR\public\rehlds\rehlds_interfaces.h"
+				$File "$SRCDIR\public\rehlds\Sequence.h"
+				$File "$SRCDIR\public\rehlds\shake.h"
+				$File "$SRCDIR\public\rehlds\spritegn.h"
+				$File "$SRCDIR\public\rehlds\static_map.h"
+				$File "$SRCDIR\public\rehlds\studio.h"
+				$File "$SRCDIR\public\rehlds\sys_shared.h"
+				$File "$SRCDIR\public\rehlds\userid_rehlds.h"
+				$File "$SRCDIR\public\rehlds\pr_dlls.h"
+			}
+			
+			$Folder	"steam"
+			{
+				$File "$SRCDIR\public\steam\isteamapps.h"
+				$File "$SRCDIR\public\steam\isteambilling.h"
+				$File "$SRCDIR\public\steam\isteamclient.h"
+				$File "$SRCDIR\public\steam\isteamcontroller.h"
+				$File "$SRCDIR\public\steam\isteamfriends.h"
+				$File "$SRCDIR\public\steam\isteamgameserver.h"
+				$File "$SRCDIR\public\steam\isteamgameserverstats.h"
+				$File "$SRCDIR\public\steam\isteamhttp.h"
+				$File "$SRCDIR\public\steam\isteammatchmaking.h"
+				$File "$SRCDIR\public\steam\isteamnetworking.h"
+				$File "$SRCDIR\public\steam\isteamremotestorage.h"
+				$File "$SRCDIR\public\steam\isteamscreenshots.h"
+				$File "$SRCDIR\public\steam\isteamunifiedmessages.h"
+				$File "$SRCDIR\public\steam\isteamuser.h"
+				$File "$SRCDIR\public\steam\isteamuserstats.h"
+				$File "$SRCDIR\public\steam\isteamutils.h"
+				$File "$SRCDIR\public\steam\matchmakingtypes.h"
+				$File "$SRCDIR\public\steam\steamclientpublic.h"
+				$File "$SRCDIR\public\steam\steamhttpenums.h"
+				$File "$SRCDIR\public\steam\steamtypes.h"
+				$File "$SRCDIR\public\steam\steam_api.h"
+				$File "$SRCDIR\public\steam\steam_gameserver.h"
+			}
+			
+			$Folder	"tier0"
+			{
+				$File "$SRCDIR\public\tier0\dbg.cpp"
+				$File "$SRCDIR\public\tier0\dbg.h"
+				$File "$SRCDIR\public\tier0\platform.h"
+			}
+			
+			//$File "$SRCDIR\public\interface.cpp" [$POSIX]
+			$File "$SRCDIR\public\registry.cpp"
+			$File "$SRCDIR\public\steamid.cpp"			
+			$File "$SRCDIR\public\utlbuffer.cpp"
+			$File "$SRCDIR\public\strtools.h"
+			$File "$SRCDIR\public\utlbuffer.h"
+			$File "$SRCDIR\public\utllinkedlist.h"
+			$File "$SRCDIR\public\utlmemory.h"
+			$File "$SRCDIR\public\utlrbtree.h"
+			$File "$SRCDIR\public\utlvector.h"
+			$File "$SRCDIR\public\basetypes.h"
+			$File "$SRCDIR\public\commonmacros.h"
+			$File "$SRCDIR\public\engine_hlds_api.h"
+			$File "$SRCDIR\public\engine_launcher_api.h"
+			$File "$SRCDIR\public\FileSystem.h"
+			$File "$SRCDIR\public\idedicatedexports.h"
+			$File "$SRCDIR\public\interface.h"
+			$File "$SRCDIR\public\iregistry.h"
+			$File "$SRCDIR\public\savegame_version.h"
+		}
+
+		$Folder	"rehlds"
+		{
+			$File "$SRCDIR\rehlds\public_amalgamation.cpp" [$POSIX]
+			$File "$SRCDIR\rehlds\FlightRecorderImpl.cpp"
+			$File "$SRCDIR\rehlds\flight_recorder.cpp"
+			$File "$SRCDIR\rehlds\main.cpp"
+			$File "$SRCDIR\rehlds\memory.cpp" [$WIN32]
+			$File "$SRCDIR\rehlds\rehlds_api_impl.cpp"
+			$File "$SRCDIR\rehlds\rehlds_interfaces_impl.cpp"
+			$File "$SRCDIR\rehlds\hookchains_impl.cpp"
+			$File "$SRCDIR\rehlds\platform.cpp"
+			$File "$SRCDIR\rehlds\rehlds_security.cpp"
+			$File "$SRCDIR\rehlds\structSizeCheck.cpp" [$WIN32]
+			$File "$SRCDIR\rehlds\engine.h"
+			$File "$SRCDIR\rehlds\FlightRecorderImpl.h"
+			$File "$SRCDIR\rehlds\flight_recorder.h"
+			$File "$SRCDIR\rehlds\hookchains_impl.h"
+			$File "$SRCDIR\rehlds\memory.h" [$WIN32]
+			$File "$SRCDIR\rehlds\platform.h"
+			$File "$SRCDIR\rehlds\precompiled.h"
+			$File "$SRCDIR\rehlds\rehlds_api_impl.h"
+			$File "$SRCDIR\rehlds\rehlds_interfaces_impl.h"
+			$File "$SRCDIR\rehlds\rehlds_security.h"
+		}		
+	}
+	
+	$Folder	"Link Libraries"
+	{
+		$DynamicFile 	"$SRCDIR/lib/public/linux32/bzip2.a" [$LINUXALL]
+		$DynamicFile 	"$SRCDIR/lib/public/linux32/libaelf32.a" [$LINUXALL]
+		$ImpLibexternal m [$LINUXALL]
+		$ImpLibexternal rt [$LINUXALL]		
+		$Lib			"$SRCDIR/lib/public/bzip2" [$WIN32]
+		$Lib			"$SRCDIR/lib/public/libacof32" [$WIN32]
+		$ImpLibexternal steam_api
+	}	
+}
