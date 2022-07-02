@@ -35,7 +35,7 @@ ifeq ($(CFG), release)
 	#  There also was no speed difference running at 1280x1024. May 2012, mikesart.
 	#  tonyp: The size increase was likely caused by -finline-functions and -fipa-cp-clone getting switched on with -O3.
 	# -fno-omit-frame-pointer: need this for stack traces with perf.
-	OptimizerLevel_CompilerSpecific = -O2 -fno-strict-aliasing -ffast-math -fno-omit-frame-pointer -ftree-vectorize
+	OptimizerLevel_CompilerSpecific = -O3 -fno-strict-aliasing -ffast-math -fno-omit-frame-pointer -ftree-vectorize
 	ifeq ($(CLANG_BUILD),1)
 		# These aren't supported wit Clang 3.5. Need to remove when we update that.
 		OptimizerLevel_CompilerSpecific += -fpredictive-commoning -funswitch-loops
@@ -61,7 +61,7 @@ CFLAGS = $(BASE_CFLAGS) $(ENV_CFLAGS)
 ifeq ($(CLANG_BUILD),1)
 	CXXFLAGS = $(BASE_CFLAGS) -std=gnu++14 -Wno-c++11-narrowing -Wno-dangling-else $(ENV_CXXFLAGS)
 else
-	CXXFLAGS = $(BASE_CFLAGS) -std=gnu++14 -Wno-c++11-narrowing -Wno-dangling-else $(ENV_CXXFLAGS)
+	CXXFLAGS = $(BASE_CFLAGS) -std=gnu++14 -fpermissive $(ENV_CXXFLAGS)
 endif
 DEFINES += -DVPROF_LEVEL=1 -DGNUC -DNO_HOOK_MALLOC -DNO_MALLOC_OVERRIDE
 
@@ -78,31 +78,11 @@ COPY_DLL_TO_SRV = 0
 
 # We should always specify -Wl,--build-id, as documented at:
 # http://linux.die.net/man/1/ld and http://fedoraproject.org/wiki/Releases/FeatureBuildId.http://fedoraproject.org/wiki/Releases/FeatureBuildId
-LDFLAGS += -Wl,--build-id
+LDFLAGS += -Wl,--build-id,-rpath
 
-#
-# If we should be running in a chroot, check to see if we are. If not, then prefix everything with the 
-# required chroot
-#
-ifdef MAKE_CHROOT
-	export STEAM_RUNTIME_PATH := /usr
-	ifneq ("$(SCHROOT_CHROOT_NAME)", "$(CHROOT_NAME)")
-        $(info '$(SCHROOT_CHROOT_NAME)' is not '$(CHROOT_NAME)')
-        $(error This makefile should be run from within a chroot. 'schroot --chroot $(CHROOT_NAME) -- $(MAKE) $(MAKEFLAGS)')  
-	endif
-	GCC_VER = -5
-	P4BIN = $(SRCROOT)/devtools/bin/linux/p4
-else ifeq ($(USE_VALVE_BINDIR),1)
-	# Using /valve/bin directory.
-	export STEAM_RUNTIME_PATH := /usr
-	GCC_VER = -5
-	P4BIN = p4
-else
-	# Not using chroot, use old steam-runtime. (gcc 4.6.3)
-	export STEAM_RUNTIME_PATH := /usr
-	GCC_VER = -5
-	P4BIN = p4
-endif
+export STEAM_RUNTIME_PATH := /usr
+GCC_VER = -5
+P4BIN = p4
 
 ifeq ($(TARGET_PLATFORM),linux64)
 	MARCH_TARGET = core2
@@ -122,9 +102,9 @@ endif
 ifeq ($(CLANG_BUILD),1)
 	# Clang does not support -mfpmath=sse because it uses whatever
 	# instruction set extensions are available by default.
-	SSE_GEN_FLAGS = -msse2
+	SSE_GEN_FLAGS = -msse3
 else
-	SSE_GEN_FLAGS = -msse2 -mfpmath=sse
+	SSE_GEN_FLAGS = -msse3
 endif
 
 CCACHE := $(SRCROOT)/devtools/bin/linux/ccache
@@ -160,7 +140,7 @@ endif
 
 ifeq ($(CLANG_BUILD),1)
 	# Clang specific flags
-else ifeq ($(GCC_VER),-4.8)
+else ifeq ($(GCC_VER),-5)
 	WARN_FLAGS += -Wno-unused-local-typedefs
 	WARN_FLAGS += -Wno-unused-result
 	WARN_FLAGS += -Wno-narrowing
@@ -173,13 +153,13 @@ WARN_FLAGS += -fdiagnostics-show-option -Wformat -Wformat-security
 
 ifeq ($(TARGET_PLATFORM),linux64)
 	# nocona = pentium4 + 64bit + MMX, SSE, SSE2, SSE3 - no SSSE3 (that's three s's - added in core2)
-	ARCH_FLAGS += -march=$(MARCH_TARGET) -mtune=core2
+	ARCH_FLAGS += -march=$(MARCH_TARGET) -mtune=generic
 	LD_SO = ld-linux-x86_64.so.2
 	LIBSTDCXX := $(shell $(CXX) -print-file-name=libstdc++.a)
 	LIBSTDCXXPIC := $(shell $(CXX) -print-file-name=libstdc++-pic.a)
 else
 	# pentium4 = MMX, SSE, SSE2 - no SSE3 (added in prescott) # -msse3 -mfpmath=sse
-	ARCH_FLAGS += -m32 -march=$(MARCH_TARGET) -mtune=core2 $(SSE_GEN_FLAGS)
+	ARCH_FLAGS += -m32 -march=$(MARCH_TARGET) -mtune=generic $(SSE_GEN_FLAGS)
 	LD_SO = ld-linux.so.2
 	LIBSTDCXX := $(shell $(CXX) $(ARCH_FLAGS) -print-file-name=libstdc++.so)
 	LIBSTDCXXPIC := $(shell $(CXX) $(ARCH_FLAGS) -print-file-name=libstdc++.so)
