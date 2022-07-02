@@ -46,6 +46,7 @@ $Configuration
 	$Linker
 	{
 		$AdditionalDependencies			"$BASE psapi.lib ws2_32.lib" [$WIN32]
+		$GCC_ExtraLinkerFlags			"-Wl,-rpath" [$POSIX]
 	}
 }
 
