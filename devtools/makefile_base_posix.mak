@@ -78,7 +78,7 @@ COPY_DLL_TO_SRV = 0
 
 # We should always specify -Wl,--build-id, as documented at:
 # http://linux.die.net/man/1/ld and http://fedoraproject.org/wiki/Releases/FeatureBuildId.http://fedoraproject.org/wiki/Releases/FeatureBuildId
-LDFLAGS += -Wl,--build-id,-rpath
+LDFLAGS += -Wl,--build-id
 
 export STEAM_RUNTIME_PATH := /usr
 GCC_VER = -5
@@ -178,7 +178,7 @@ VSIGN ?= true
 
 LINK_MAP_FLAGS = -Wl,-Map,$(@:.so=).map
 
-SHLIBLDFLAGS = -shared $(LDFLAGS) -Wl,--no-undefined
+SHLIBLDFLAGS = -shared $(LDFLAGS) -Wl,-rpath,--no-undefined
 
 LIB_START_EXE = -static-libgcc -Wl,--start-group
 LIB_END_EXE = -Wl,--end-group -lm -ldl $(LIBSTDCXX) -lpthread 

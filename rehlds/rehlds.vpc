@@ -384,7 +384,7 @@ $Project "ReHLDS"
 
 		$Folder	"rehlds"
 		{
-			$File "$SRCDIR\rehlds\public_amalgamation.cpp" [$POSIX]
+			$File "$SRCDIR\rehlds\public_amalgamation_rehlds.cpp" [$POSIX]
 			$File "$SRCDIR\rehlds\FlightRecorderImpl.cpp"
 			$File "$SRCDIR\rehlds\flight_recorder.cpp"
 			$File "$SRCDIR\rehlds\main.cpp"
