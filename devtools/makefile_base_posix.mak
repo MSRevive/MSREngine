@@ -68,7 +68,7 @@ BUILDING_MULTI_ARCH = 0
 ENV_CFLAGS := $(CFLAGS)
 ENV_CXXFLAGS := $(CXXFLAGS)
 CPPFLAGS = $(DEFINES) $(addprefix -I, $(abspath $(INCLUDEDIRS) ))
-BASE_CFLAGS = $(ARCH_FLAGS) $(CPPFLAGS) $(WARN_FLAGS) -fvisibility=$(SymbolVisibility) $(OptimizerLevel) -pipe $(GCC_ExtraCompilerFlags) -Wall -fno-plt -Wno-unused-but-set-variable -fpermissive -fno-sized-deallocation -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections
+BASE_CFLAGS = $(ARCH_FLAGS) $(CPPFLAGS) $(WARN_FLAGS) -fvisibility=$(SymbolVisibility) $(OptimizerLevel) -pipe $(GCC_ExtraCompilerFlags) -Wall -fpermissive -fno-sized-deallocation -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections
 BASE_CXXFLAGS = -std=c++14
 # Additional CXXFLAGS when compiling PCH files
 PCH_CXXFLAGS =
@@ -216,12 +216,19 @@ LINK_MAP_FLAGS = -Wl,-Map,$(@:.so=).map
 
 SHLIBLDFLAGS = -shared $(LDFLAGS) -Wl,-rpath,'$ORIGIN/.',--no-undefined
 
+_WRAP := -Xlinker --wrap=
+PATHWRAP = $(_WRAP)fopen $(_WRAP)freopen $(_WRAP)open    $(_WRAP)creat    $(_WRAP)access  $(_WRAP)__xstat \
+	   $(_WRAP)stat  $(_WRAP)lstat   $(_WRAP)fopen64 $(_WRAP)open64   $(_WRAP)opendir $(_WRAP)__lxstat \
+	   $(_WRAP)chmod $(_WRAP)chown   $(_WRAP)lchown  $(_WRAP)symlink  $(_WRAP)link    $(_WRAP)__lxstat64 \
+	   $(_WRAP)mknod $(_WRAP)utimes  $(_WRAP)unlink  $(_WRAP)rename   $(_WRAP)utime   $(_WRAP)__xstat64 \
+	   $(_WRAP)mount $(_WRAP)mkfifo  $(_WRAP)mkdir   $(_WRAP)rmdir    $(_WRAP)scandir $(_WRAP)realpath
+
 CFLAGS += -fno-stack-protector
 
-LIB_START_EXE = -static-libgcc -static-libstdc++ -Wl,--start-group
+LIB_START_EXE = $(PATHWRAP) -static-libgcc -static-libstdc++ -Wl,--start-group
 LIB_END_EXE = -Wl,--end-group -lm -ldl $(LIBSTDCXX) -lpthread
 
-LIB_START_SHLIB = -static-libgcc -static-libstdc++ -Wl,--start-group
+LIB_START_SHLIB = $(PATHWRAP) -static-libgcc -static-libstdc++ -Wl,--start-group
 LIB_END_SHLIB = -Wl,--end-group -lm -ldl $(LIBSTDCXXPIC) -lpthread -l:$(LD_SO) -Wl,--version-script=$(SRCROOT)/devtools/version_script_rehlds.linux.txt
 
 #
