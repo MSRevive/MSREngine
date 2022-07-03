@@ -10,12 +10,12 @@
 
 $Project "hlds"
 {
-	"dedicated\dedicated.vpc"
+	"dedicated\dedicated.vpc" [$WIN32]
 }
 
 $Project "filesystem_stdio"
 {
-	"filesystem\filesystem.vpc"
+	"filesystem\filesystem.vpc" [$WIN32]
 }
 
 $Project "bzip2"

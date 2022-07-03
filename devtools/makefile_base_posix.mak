@@ -225,10 +225,10 @@ PATHWRAP = $(_WRAP)fopen $(_WRAP)freopen $(_WRAP)open    $(_WRAP)creat    $(_WRA
 
 CFLAGS += -fno-stack-protector
 
-LIB_START_EXE = $(PATHWRAP) -static-libgcc -static-libstdc++ -Wl,--start-group
+LIB_START_EXE = -static-libgcc -static-libstdc++ -Wl,--start-group
 LIB_END_EXE = -Wl,--end-group -lm -ldl $(LIBSTDCXX) -lpthread
 
-LIB_START_SHLIB = $(PATHWRAP) -static-libgcc -static-libstdc++ -Wl,--start-group
+LIB_START_SHLIB = -static-libgcc -static-libstdc++ -Wl,--start-group
 LIB_END_SHLIB = -Wl,--end-group -lm -ldl $(LIBSTDCXXPIC) -lpthread -l:$(LD_SO) -Wl,--version-script=$(SRCROOT)/devtools/version_script_rehlds.linux.txt
 
 #
