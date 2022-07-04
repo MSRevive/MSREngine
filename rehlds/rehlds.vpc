@@ -39,14 +39,13 @@ $Configuration
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR;$SRCDIR\rehlds;$SRCDIR\common;$SRCDIR\public;$SRCDIR\engine;$SRCDIR\movement;$SRCDIR\public\rehlds;$SRCDIR\utils"
 		$PreprocessorDefinitions		"$BASE;REHLDS_API;REHLDS_FIXES;REHLDS_SSE;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS" [$WIN32]
-		$PreprocessorDefinitions		"$BASE;SWDS;REHLDS_JIT;REHLDS_SSE;REHLDS_FIXES;REHLDS_CHECKS;REHLDS_API;REHLDS_SELF;REHLDS_OPT_PEDANTIC;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;_GLIBCXX_USE_CXX11_ABI=0;_stricmp=strcasecmp;_strnicmp=strncasecmp;_strdup=strdup;_unlink=unlink;_vsnprintf=vsnprintf;_vsnwprintf=vswprintf;BUILD_STATIC_LIBSTDC" [$POSIX]
+		$PreprocessorDefinitions		"$BASE;SWDS;REHLDS_JIT;REHLDS_SSE;REHLDS_FIXES;REHLDS_CHECKS;REHLDS_API;REHLDS_SELF;REHLDS_OPT_PEDANTIC;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;_stricmp=strcasecmp;_strnicmp=strncasecmp;_strdup=strdup;_unlink=unlink;_vsnprintf=vsnprintf;_vsnwprintf=vswprintf;_LINUX;LINUX" [$POSIX]
 		$EnableC++Exceptions			"Yes (/EHsc)"
 	}
 
 	$Linker
 	{
 		$AdditionalDependencies			"$BASE psapi.lib ws2_32.lib" [$WIN32]
-		$GCC_ExtraLinkerFlags			"-Wl,-rpath" [$POSIX]
 	}
 }
 
@@ -410,12 +409,11 @@ $Project "ReHLDS"
 	
 	$Folder	"Link Libraries"
 	{
-		$DynamicFile 	"$SRCDIR/lib/public/linux32/bzip2.a" [$LINUXALL]
-		$DynamicFile 	"$SRCDIR/lib/public/linux32/libaelf32.a" [$LINUXALL]
+		$Lib 	bzip2
+		$Lib 	libaelf32 [$LINUXALL]
+		$Lib	libacof32 [$WIN32]
 		$ImpLibexternal m [$LINUXALL]
-		$ImpLibexternal rt [$LINUXALL]		
-		$Lib			"$SRCDIR/lib/public/bzip2" [$WIN32]
-		$Lib			"$SRCDIR/lib/public/libacof32" [$WIN32]
+		$ImpLibexternal rt [$LINUXALL]
 		$ImpLibexternal steam_api
 	}	
 }

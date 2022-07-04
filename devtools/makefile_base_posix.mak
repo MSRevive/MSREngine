@@ -13,28 +13,8 @@
 #  @	command is not printed to stdout before being executed
 #  +	command is executed even if Make is invoked in "do not exec" mode
 
-
-ifneq "$(LINUX_TOOLS_PATH)" ""
-TOOL_PATH = $(LINUX_TOOLS_PATH)/
-endif
-
-# Allow redirection to an arbitrary location for the tools we use.
-# This helps with cross-compilation by not requiring Linux tools
-# to be on the path and possibly overriding Windows tools.
-CP = $(TOOL_PATH)cp
-CUT = $(TOOL_PATH)cut
-DIRNAME = $(TOOL_PATH)dirname
-ECHO = $(TOOL_PATH)echo
-FGREP = $(TOOL_PATH)fgrep
-FIND = $(TOOL_PATH)find
-GREP = $(TOOL_PATH)grep
-MKDIR = $(TOOL_PATH)mkdir
-RM = $(TOOL_PATH)rm
-TAIL = $(TOOL_PATH)tail
-SHELL = $(TOOL_PATH)bash
-
-OS := $($(SHELL) $(TOOL_PATH)uname)
-HOSTNAME := $($(SHELL) $(TOOL_PATH)hostname)
+OS := $(shell uname)
+HOSTNAME := $(shell hostname)
 VALVE_NO_AUTO_P4=1
 
 # To build with clang, set the following in your environment:
@@ -48,11 +28,17 @@ ifeq ($(OS),Darwin)
     $(error This file should never be used for Mac - use base.xconfig)
 endif
 
-# Optimization flags specific to compiler/CFG combination
 ifeq ($(CFG), release)
-	OptimizerLevel_CompilerSpecific = -U_FORTIFY_SOURCE -g0 -O3
+	OptimizerLevel_CompilerSpecific = -O2 -fno-strict-aliasing -fno-omit-frame-pointer -ftree-vectorize
+	ifeq ($(CLANG_BUILD),1)
+		# These aren't supported wit Clang 3.5. Need to remove when we update that.
+		OptimizerLevel_CompilerSpecific += -fpredictive-commoning -funswitch-loops
+	else
+		OptimizerLevel_CompilerSpecific += -fpredictive-commoning -funswitch-loops
+	endif
 else
 	OptimizerLevel_CompilerSpecific = -O0
+	#-O1 -finline-functions
 endif
 
 # When we move to a modern toolchain, this will be necessary for early testing
@@ -68,35 +54,19 @@ BUILDING_MULTI_ARCH = 0
 ENV_CFLAGS := $(CFLAGS)
 ENV_CXXFLAGS := $(CXXFLAGS)
 CPPFLAGS = $(DEFINES) $(addprefix -I, $(abspath $(INCLUDEDIRS) ))
-BASE_CFLAGS = $(ARCH_FLAGS) $(CPPFLAGS) $(WARN_FLAGS) -fvisibility=$(SymbolVisibility) $(OptimizerLevel) -pipe $(GCC_ExtraCompilerFlags) -Wall -fpermissive -fno-sized-deallocation -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections
-BASE_CXXFLAGS = -std=c++14
-# Additional CXXFLAGS when compiling PCH files
-PCH_CXXFLAGS =
-
-# Compiler specific flags
-ifeq ($(CLANG_BUILD),1)
-	# The template depth for C++11 should be 1024, but compilers differ greatly. We go beyond 256 in at least one
-	# spot, so turn it up to 900 which is GCC's default as of this writing
-	BASE_CXXFLAGS += -ftemplate-depth=900
-	# Needed for older versions of clang (newer versions are compatible with gcc syntax)
-	PCH_CXXFLAGS += -emit-pch
-else
-	# GCC specific - better PCH behavior w/ccache and better debugging information
-	BASE_CFLAGS += -fpch-preprocess -fvar-tracking-assignments
-endif
-
-DEFINES += -DVPROF_LEVEL=1 -DGNUC -DNO_HOOK_MALLOC
-
-## TODO: This cases build errors in cstrike/bin right now. Need to debug.
-# This causes all filesystem interfaces to default to their 64bit versions on
-# 32bit systems, which means we don't break on filesystems with inodes > 32bit.
-# DEFINES += -D_FILE_OFFSET_BITS=64
-
-# Final CFLAGS/CXXFLAGS
+BASE_CFLAGS = $(ARCH_FLAGS) $(CPPFLAGS) $(WARN_FLAGS) -fvisibility=$(SymbolVisibility) $(OptimizerLevel) -pipe $(GCC_ExtraCompilerFlags) -Usprintf -Ustrncpy -UPROTECTED_THINGS_ENABLE
 CFLAGS = $(BASE_CFLAGS) $(ENV_CFLAGS)
-CXXFLAGS = $(BASE_CFLAGS) $(BASE_CXXFLAGS) $(ENV_CXXFLAGS)
-LDFLAGS = $(CFLAGS) $(GCC_ExtraLinkerFlags) -Wl,-gc-sections $(OptimizerLevel)
-GENDEP_CXXFLAGS = -MMD -MP -MF $(patsubst %.gch,%.P,$(@:.o=.P)) -MT $@
+# In -std=gnu++0x mode we get lots of errors about "error: narrowing conversion". -fpermissive
+# turns these into warnings in gcc, and -Wno-c++11-narrowing suppresses them entirely in clang 3.1+.
+ifeq ($(CLANG_BUILD),1)
+	CXXFLAGS = $(BASE_CFLAGS) -std=gnu++14 -Wno-c++11-narrowing -Wno-dangling-else $(ENV_CXXFLAGS)
+else
+	CXXFLAGS = $(BASE_CFLAGS) -std=gnu++14 -fpermissive $(ENV_CXXFLAGS)
+endif
+DEFINES += -DVPROF_LEVEL=1 -DGNUC -DNO_HOOK_MALLOC -DNO_MALLOC_OVERRIDE
+
+LDFLAGS = $(CFLAGS) $(GCC_ExtraLinkerFlags) $(OptimizerLevel)
+GENDEP_CXXFLAGS = -MMD -MP -MF $(@:.o=.P) 
 MAP_FLAGS =
 Srv_GAMEOUTPUTFILE = 
 COPY_DLL_TO_SRV = 0
@@ -134,29 +104,23 @@ endif
 
 CCACHE := $(SRCROOT)/devtools/bin/linux/ccache
 
-# - pch_defines,time_macros,file_macro needed for precompiled headers to be beneficial. See additional ".defines" wrapper
-#   for PCH below to prevent this from biting us (in theory)
-# - include_file_ctime/mtime causes re-generated but identical headers, like protobuf, to cause a cache miss. I couldn't
-#   find the justification for this setting being on by default, perhaps to not waste time preprocessing the files?
-#   Let's find out the painful way.
-export CCACHE_SLOPPINESS := $(CCACHE_SLOPPINESS),time_macros,file_macro,include_file_ctime,include_file_mtime,pch_defines
-# Needed for clang to take advantage of PCH, we include the PCH in the
-# source files and clang doesn't support -fpch-preprocess properly
-ifeq ($(CLANG_BUILD),1)
-	export CCACHE_CPP2 = 1
-endif
-
-# If not specified by environment, use steam runtime compilers + in-tree ccache
-ifneq ($(filter default undefined,$(origin AR)),)
+ifeq ($(origin AR), default)
 	AR = $(STEAM_RUNTIME_PATH)/bin/ar crs
 endif
-ifneq ($(filter default undefined,$(origin CC)),)
-	CC = $(CCACHE) $(STEAM_RUNTIME_PATH)/bin/gcc$(GCC_VER)
+ifeq ($(origin CC), default)
+	CC = $(CCACHE) $(STEAM_RUNTIME_PATH)/bin/gcc$(GCC_VER)	
 endif
-ifneq ($(filter default undefined,$(origin CXX)),)
+ifeq ($(origin CXX), default)
 	CXX = $(CCACHE) $(STEAM_RUNTIME_PATH)/bin/g++$(GCC_VER)
 endif
 
+# Support ccache with clang. Add -Qunused-arguments to avoid excessive warnings due to
+# a ccache quirk. Could also upgrade ccache.
+# http://petereisentraut.blogspot.com/2011/05/ccache-and-clang.html
+ifeq ($(CLANG_BUILD),1)
+	CC := $(CCACHE) $(CC) -Qunused-arguments -fcolor-diagnostics
+	CXX := $(CCACHE) $(CXX) -Qunused-arguments -fcolor-diagnostics
+endif
 LINK ?= $(CC)
 
 ifeq ($(STEAM_BRANCH),1)
@@ -165,34 +129,32 @@ else
 	WARN_FLAGS = -Wall -Wno-invalid-offsetof -Wno-multichar -Wno-overloaded-virtual
 	WARN_FLAGS += -Wno-write-strings
 	WARN_FLAGS += -Wno-unused-variable
+	WARN_FLAGS += -Wno-unused-but-set-variable
 	WARN_FLAGS += -Wno-unused-function
-	# Additional warnings to -Wall
-	WARN_FLAGS += -Winvalid-pch -Wswitch
 endif
 
 ifeq ($(CLANG_BUILD),1)
 	# Clang specific flags
-	WARN_FLAGS += -Wno-unused-const-variable -Wno-unused-local-typedef
 else ifeq ($(GCC_VER),-5)
+	WARN_FLAGS += -Wno-unused-local-typedefs
 	WARN_FLAGS += -Wno-unused-result
-	WARN_FLAGS += -Wno-unused-but-set-variable	
+	WARN_FLAGS += -Wno-narrowing
 	# WARN_FLAGS += -Wno-unused-function
 endif
 
-WARN_FLAGS += -Wno-delete-non-virtual-dtor -Wno-sign-compare -Wno-strict-aliasing -Wno-ignored-attributes
-WARN_FLAGS += -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-value
-WARN_FLAGS += -Wno-invalid-offsetof -Wno-float-equal -Wno-reorder -Werror=return-type
+WARN_FLAGS += -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-value -Wno-missing-field-initializers
+WARN_FLAGS += -Wno-sign-compare -Wno-reorder -Wno-invalid-offsetof -Wno-float-equal -Werror=return-type
 WARN_FLAGS += -fdiagnostics-show-option -Wformat -Wformat-security
 
 ifeq ($(TARGET_PLATFORM),linux64)
 	# nocona = pentium4 + 64bit + MMX, SSE, SSE2, SSE3 - no SSSE3 (that's three s's - added in core2)
-	ARCH_FLAGS += -march=$(MARCH_TARGET) -mtune=generic
+	ARCH_FLAGS += -march=$(MARCH_TARGET) -mtune=core2
 	LD_SO = ld-linux-x86_64.so.2
 	LIBSTDCXX := $(shell $(CXX) -print-file-name=libstdc++.a)
 	LIBSTDCXXPIC := $(shell $(CXX) -print-file-name=libstdc++-pic.a)
 else
 	# pentium4 = MMX, SSE, SSE2 - no SSE3 (added in prescott) # -msse3 -mfpmath=sse
-	ARCH_FLAGS += -m32 -march=$(MARCH_TARGET) -mtune=generic $(SSE_GEN_FLAGS)
+	ARCH_FLAGS += -m32 -march=$(MARCH_TARGET) -mtune=core2 $(SSE_GEN_FLAGS)
 	LD_SO = ld-linux.so.2
 	LIBSTDCXX := $(shell $(CXX) $(ARCH_FLAGS) -print-file-name=libstdc++.so)
 	LIBSTDCXXPIC := $(shell $(CXX) $(ARCH_FLAGS) -print-file-name=libstdc++.so)
@@ -209,27 +171,15 @@ else
 endif
 VSIGN ?= true
 
-Srv_GAMEOUTPUTFILE = 
-COPY_DLL_TO_SRV = 0
-
 LINK_MAP_FLAGS = -Wl,-Map,$(@:.so=).map
 
-SHLIBLDFLAGS = -shared $(LDFLAGS) -Wl,-rpath,'$ORIGIN/.',--no-undefined
+SHLIBLDFLAGS = -shared $(LDFLAGS) -Wl,-rpath,'$ORIGIN/.'
 
-_WRAP := -Xlinker --wrap=
-PATHWRAP = $(_WRAP)fopen $(_WRAP)freopen $(_WRAP)open    $(_WRAP)creat    $(_WRAP)access  $(_WRAP)__xstat \
-	   $(_WRAP)stat  $(_WRAP)lstat   $(_WRAP)fopen64 $(_WRAP)open64   $(_WRAP)opendir $(_WRAP)__lxstat \
-	   $(_WRAP)chmod $(_WRAP)chown   $(_WRAP)lchown  $(_WRAP)symlink  $(_WRAP)link    $(_WRAP)__lxstat64 \
-	   $(_WRAP)mknod $(_WRAP)utimes  $(_WRAP)unlink  $(_WRAP)rename   $(_WRAP)utime   $(_WRAP)__xstat64 \
-	   $(_WRAP)mount $(_WRAP)mkfifo  $(_WRAP)mkdir   $(_WRAP)rmdir    $(_WRAP)scandir $(_WRAP)realpath
+LIB_START_EXE = -static-libgcc -Wl,--start-group
+LIB_END_EXE = -Wl,--end-group -lm -ldl $(LIBSTDCXX) -lpthread 
 
-CFLAGS += -fno-stack-protector
-
-LIB_START_EXE = -static-libgcc -static-libstdc++ -Wl,--start-group
-LIB_END_EXE = -Wl,--end-group -lm -ldl $(LIBSTDCXX) -lpthread
-
-LIB_START_SHLIB = -static-libgcc -static-libstdc++ -Wl,--start-group
-LIB_END_SHLIB = -Wl,--end-group -lm -ldl $(LIBSTDCXXPIC) -lpthread -l:$(LD_SO) -Wl,--version-script=$(SRCROOT)/devtools/version_script_rehlds.linux.txt
+LIB_START_SHLIB = -static-libgcc -Wl,--start-group
+LIB_END_SHLIB = -Wl,--end-group -lm -ldl $(LIBSTDCXXPIC) -lpthread -l:$(LD_SO) -Wl,--version-script=$(SRCROOT)/devtools/version_script.linux.txt
 
 #
 # Profile-directed optimizations.
@@ -284,92 +234,22 @@ GEN_DEP_FILE=
 
 PRE_COMPILE_FILE = 
 
-POST_COMPILE_FILE =
-
-ifeq ($(CLANG_BUILD),1)
-	# https://bugzilla.samba.org/show_bug.cgi?id=11251
-
-	# ccache bug 11251: Clang PCH files always have the timestamps of their deps baked in, so if
-	# make thinks a file needs to be rebuilt, ccache pulling an older one from cache will cause
-	# an error.
-
-	# Unfortunately, this means any touching of headers in PCH files will cause it to be rebuilt
-	# and all files using that PCH to cache-miss.
-
-	# One specific case we could fix is otherwise-no-op *clean* builds missing the cache: We
-	# could use a similar trick to the the CCACHE_EXTRAFILES hack used below to bake timestamps
-	# into the PCH, so that at least clean builds could pull a PCH from cache.
-	PCH_CXX = CCACHE_DISABLE=1 $(CXX)
-	# Newer clang supports the -include $PCH_FILE syntax for finding the associated GCH, but for compatibility with
-	# older versions we'll use the more explicit -include-pch option
-	INCLUDE_PCH_FILE = -include-pch $(TARGET_PCH_FILE).gch
-else
-	PCH_CXX = $(CXX)
-	INCLUDE_PCH_FILE = -include $(abspath $(TARGET_PCH_FILE))
-endif
+POST_COMPILE_FILE = 
 
 ifeq ($(BUILDING_MULTI_ARCH),1)
 	SINGLE_ARCH_CXXFLAGS=$(subst -arch x86_64,,$(CXXFLAGS))
-	_MULTI_ARCH_FIRST_FILE = \
-		mkdir -p $(OBJ_DIR) && \
-		$(CXX) $(SINGLE_ARCH_CXXFLAGS) $(GENDEP_CXXFLAGS) -o $@ -c $<
-	_MULTI_ARCH_SECOND_FILE = $(CXX) $(CXXFLAGS) -o $@ -c $<
-
-	COMPILE_FILE = $(QUIET_PREFIX) \
-		echo "--M- $(lastword $(subst /, ,$<)) ----";\
-		$(_MULTI_ARCH_FIRST_FILE) $(_MULTI_ARCH_SECOND_FILE)
-
-	COMPILE_FILE_WITH_PCH = \
+	COMPILE_FILE = \
 		$(QUIET_PREFIX) \
-		echo "-PM- $(lastword $(subst /, ,$<)) ----";\
-		$(COMPILE_MULTI_ARCH_FIRST_FILE) $(INCLUDE_PCH_FILE) \
-		$(COMPILE_MULTI_ARCH_SECOND_FILE) $(INCLUDE_PCH_FILE)
-
-	# Compile for PCH - the VPC code handles the deps for these
-	# (See EXTRAFILES note below in non-multiarch compile)
-	PCH_FINAL_CXXFLAGS = $(filter-out -gsplit-dwarf,$(SINGLE_ARCH_CXXFLAGS) $(GENDEP_CXXFLAGS) $(PCH_CXXFLAGS))
-	PCH_FINAL_CXXFLAGS_MULTI = $(filter-out -gsplit-dwarf,$(CXXFLAGS) $(PCH_CXXFLAGS))
-	COMPILE_PCH = \
-		$(QUIET_PREFIX) \
-		echo "-M-- $(lastword $(subst /, ,$<)) [PCH] ----";\
+		echo "---- $(lastword $(subst /, ,$<)) as MULTIARCH----";\
 		mkdir -p $(OBJ_DIR) && \
-		$(CXX)  -x c++-header -E -dM -o $@.defines -c $< && \
-		CCACHE_EXTRAFILES=$@.defines $(PCH_CXX) $(PCH_FINAL_CXXFLAGS) -x c++-header -o $@ -c $< && \
-		$(CXX) $(CXXFLAGS) $(PCH_CXXFLAGS) -x c++-header -E -dM -o $@.defines -c $< && \
-		CCACHE_EXTRAFILES=$@.defines $(PCH_CXX) $(PCH_FINAL_CXXFLAGS_MULTI) -x c++-header -o $@ -c $<
+		$(CXX) $(SINGLE_ARCH_CXXFLAGS) $(GENDEP_CXXFLAGS) -o $@ -c $< && \
+		$(CXX) $(CXXFLAGS) -o $@ -c $<
 else
-	COMPILE_FILE_BASE = \
+	COMPILE_FILE = \
+		$(QUIET_PREFIX) \
+		echo "---- $(lastword $(subst /, ,$<)) ----";\
 		mkdir -p $(OBJ_DIR) && \
 		$(CXX) $(CXXFLAGS) $(GENDEP_CXXFLAGS) -o $@ -c $<
-
-	COMPILE_FILE = \
-		$(QUIET_PREFIX) echo "---- $(lastword $(subst /, ,$<)) ----"; \
-		$(COMPILE_FILE_BASE)
-
-	COMPILE_FILE_WITH_PCH = \
-		$(QUIET_PREFIX) \
-		echo "-P-- $(lastword $(subst /, ,$<)) ----"; \
-		$(COMPILE_FILE_BASE) $(INCLUDE_PCH_FILE)
-
-	# Compile for PCH - the VPC code handles the deps for these.
-	#
-	# Because we set CCACHE_SLOPPINESS=pch_defines (or ccache would recompile it every time), we'll miss define-only
-	# changes in dep files. As a dirty workaround, when we compile a PCH file, first run with
-	# { -E -dM -o $@.defines } to build a file that represents all of the defines in that file, then pass that
-	# .defines to CCACHE_EXTRAFILES for the real compile.
-	#
-	# This allows ccache to properly re-compile when defines change, so we can still cache PCH files (except for
-	# clang, see PCH_CXX definition above). This is a huge compile speedup for clean builds and other changes that
-	# don't affect the preprocessed result of the PCH.
-	#
-	# Adding to the fun things-that-break-ccache list, -gsplit-dwarf on PCH compiles -> 100% miss rate (and thus
-	# 100% miss on all files using it
-	PCH_FINAL_CXXFLAGS = $(filter-out -gsplit-dwarf,$(CXXFLAGS) $(GENDEP_CXXFLAGS) $(PCH_CXXFLAGS))
-	COMPILE_PCH = \
-		$(QUIET_PREFIX) echo "---- $(lastword $(subst /, ,$<)) [PCH] ----";\
-		mkdir -p $(OBJ_DIR) && \
-		$(PCH_CXX) $(PCH_FINAL_CXXFLAGS) -x c++-header -E -dM -o $@.defines $< && \
-		CCACHE_EXTRAFILES=$@.defines $(PCH_CXX) $(PCH_FINAL_CXXFLAGS) -x c++-header -o $@ -c $<
 endif
 
 ifneq "$(origin VALVE_NO_AUTO_P4)" "undefined"
@@ -378,12 +258,12 @@ ifneq "$(origin VALVE_NO_AUTO_P4)" "undefined"
 	P4_REVERT_START = true
 	P4_REVERT_END =
 else
-	# You can use an environment variable to specify what changelist to check the Linux Binaries out into. Normally the default
-	# setting is best, but here is an alternate example:
-	# export P4_EDIT_CHANGELIST_CMD="echo 1424335"
-	# ?= means that if P4_EDIT_CHANGELIST_CMD is already set it won't be changed.
-	P4_EDIT_CHANGELIST_CMD ?= $(P4BIN) changes -c `$(P4BIN) client -o | grep ^Client | cut -f 2` -s pending | fgrep 'POSIX Auto Checkout' | cut -d' ' -f 2 | tail -n 1
 	ifndef P4_EDIT_CHANGELIST
+		# You can use an environment variable to specify what changelist to check the Linux Binaries out into. Normally the default
+		# setting is best, but here is an alternate example:
+		# export P4_EDIT_CHANGELIST_CMD="echo 1424335"
+		# ?= means that if P4_EDIT_CHANGELIST_CMD is already set it won't be changed.
+		P4_EDIT_CHANGELIST_CMD ?= $(P4BIN) changes -c `$(P4BIN) client -o | grep ^Client | cut -f 2` -s pending | fgrep 'POSIX Auto Checkout' | cut -d' ' -f 2 | tail -n 1
 		P4_EDIT_CHANGELIST := $(shell $(P4_EDIT_CHANGELIST_CMD))
 	endif
 	ifeq ($(P4_EDIT_CHANGELIST),)
@@ -392,7 +272,7 @@ else
 		# Warning: the behavior of 'echo' is not consistent. In bash you need the "-e" option in order for \n to be
 		# interpreted as a line-feed, but in dash you do not, and if "-e" is passed along then it is printed, which
 		# confuses p4. So, if you run this command from the bash shell don't forget to add "-e" to the echo command.
-		P4_EDIT_CHANGELIST = $(shell /bin/echo -e "Change: new\nDescription: POSIX Auto Checkout" | $(P4BIN) change -i | cut -f 2 -d ' ')
+		P4_EDIT_CHANGELIST = $(shell echo -e "Change: new\nDescription: POSIX Auto Checkout" | $(P4BIN) change -i | cut -f 2 -d ' ')
 	endif
 
 	P4_EDIT_START := for f in
@@ -401,7 +281,7 @@ else
 	P4_REVERT_END := ; do if [ -n $$f ]; then if [ -d $$f ]; then find $$f -type f -print | $(P4BIN) -x - revert; else $(P4BIN) revert $$f; fi; fi; done $(QUIET_ECHO_POSTFIX) 
 endif
 
-ifneq "$(GAMEOUTPUTFILE)" ""
+ifeq ($(CONFTYPE),dll)
 all: $(OTHER_DEPENDENCIES) $(OBJS) $(GAMEOUTPUTFILE)
 	@echo $(GAMEOUTPUTFILE) $(QUIET_ECHO_POSTFIX)
 else
@@ -480,27 +360,20 @@ ifneq "$(GAMEOUTPUTFILE)" ""
 endif
 
 
-# This just reverts the final targets so it'll do a relink next time we build.
+# This just deletes the final targets so it'll do a relink next time we build.
 cleantargets:
-ifneq "$(GAMEOUTPUTFILE)" ""
-	$(QUIET_PREFIX) echo "$(P4BIN) revert $(GAMEOUTPUTFILE)"
-	$(QUIET_PREFIX) $(P4_REVERT_START) $(GAMEOUTPUTFILE) $(GAMEOUTPUTFILE)$(SYM_EXT) $(P4_REVERT_END)
-endif
-ifneq "$(OUTPUTFILE)" ""
-	$(QUIET_PREFIX) echo "$(P4BIN) revert $(OUTPUTFILE)"
-	$(QUIET_PREFIX) $(P4_REVERT_START) $(OUTPUTFILE) $(OUTPUTFILE)$(SYM_EXT) $(P4_REVERT_END)
-endif
+	$(QUIET_PREFIX) rm -f $(OUTPUTFILE) $(GAMEOUTPUTFILE)
+
 
 $(LIB_File): $(OTHER_DEPENDENCIES) $(OBJS) 
 	$(QUIET_PREFIX) -$(P4_EDIT_START) $(LIB_File) $(P4_EDIT_END); 
 	$(QUIET_PREFIX) $(AR) $(LIB_File) $(OBJS) $(LIBFILES);
-	$(SHELL) -c "$(POSTBUILDCOMMAND)"
 
 SO_GameOutputFile = $(GAMEOUTPUTFILE)
 
 # Remove the target before installing a file over it; this prevents existing
 # instances of the game from crashing due to the overwrite.
-$(GAMEOUTPUTFILE): $(OUTPUTFILE)
+$(SO_GameOutputFile): $(SO_File)
 	$(QUIET_PREFIX) \
 	$(P4_EDIT_START) $(GAMEOUTPUTFILE) $(P4_EDIT_END) && \
 	echo "----" $(QUIET_ECHO_POSTFIX);\
@@ -538,9 +411,7 @@ $(SO_File): $(OTHER_DEPENDENCIES) $(OBJS) $(LIBFILENAMES)
 	echo "----" $(QUIET_ECHO_POSTFIX);\
 	\
 	$(LINK) $(LINK_MAP_FLAGS) $(SHLIBLDFLAGS) $(PROFILE_LINKER_FLAG) -o $(OUTPUTFILE) $(LIB_START_SHLIB) $(OBJS) $(LIBFILES) $(SystemLibraries) $(LIB_END_SHLIB);
-	$(QUIET_PREFIX) $(VSIGN) -signvalve $(OUTPUTFILE);
-	$(QUIET_PREFIX) $(SHELL) -c "$(POSTBUILDCOMMAND)"
-
+	$(VSIGN) -signvalve $(OUTPUTFILE);
 
 
 $(EXE_File) : $(OTHER_DEPENDENCIES) $(OBJS) $(LIBFILENAMES)
@@ -555,7 +426,6 @@ $(EXE_File) : $(OTHER_DEPENDENCIES) $(OBJS) $(LIBFILENAMES)
 	$(QUIET_PREFIX) $(GEN_SYM) $(OUTPUTFILE);
 	$(QUIET_PREFIX) -$(STRIP) $(OUTPUTFILE);
 	$(QUIET_PREFIX) $(VSIGN) -signvalve $(OUTPUTFILE);
-	$(QUIET_PREFIX) $(SHELL) -c "$(POSTBUILDCOMMAND)"
 
 
 tags:

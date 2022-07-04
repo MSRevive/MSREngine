@@ -16,7 +16,7 @@ $Configuration
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR;$SRCDIR\dedicated;$SRCDIR\common;$SRCDIR\engine;$SRCDIR\public;$SRCDIR\public\rehlds"
 		$PreprocessorDefinitions		"$BASE;LAUNCHER_FIXES;DEDICATED;_CRT_SECURE_NO_WARNINGS;USE_BREAKPAD_HANDLER;_CONSOLE;NDEBUG" [$WIN32]
-		$PreprocessorDefinitions		"$BASE;_stricmp=strcasecmp;_strnicmp=strncasecmp;_strdup=strdup;_vsnprintf=vsnprintf;_GLIBCXX_USE_CXX11_ABI=0" [$POSIX]
+		$PreprocessorDefinitions		"$BASE;_stricmp=strcasecmp;_strnicmp=strncasecmp;_strdup=strdup;_vsnprintf=vsnprintf;_LINUX;LINUX" [$POSIX]
 		$EnableC++Exceptions			"Yes (/EHsc)"
 	}
 
