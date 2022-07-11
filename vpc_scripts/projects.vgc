@@ -10,7 +10,7 @@
 
 $Project "hlds"
 {
-	"dedicated\dedicated.vpc" [$WIN32]
+	"dedicated\dedicated.vpc"
 }
 
 $Project "filesystem_stdio"
