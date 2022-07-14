@@ -177,6 +177,7 @@ App_Data/*.ldf
 # Compiled stuff.
 *.dll
 *.exe
+*.lib
 
 # Windows image file caches
 Thumbs.db
