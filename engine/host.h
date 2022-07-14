@@ -32,7 +32,13 @@
 #include "filesystem_internal.h"
 #include "sys_dll.h"
 #include "server.h"
-#include "rehlds_api.h"
+#include "archtypes.h"
+#include "cmd_rehlds.h"
+#include "rehlds_interfaces.h"
+#include "interface.h"
+#include "model.h"
+#include "ObjectList.h"
+#include "pr_dlls.h"
 
 const int MAX_COMMAND_LINE_PARAMS = 50;
 

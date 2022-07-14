@@ -39,28 +39,7 @@ char *szReslistsExt = ".lst";
 
 const char *GetCurrentSteamAppName(void)
 {
-	if (!Q_stricmp(com_gamedir, "cstrike") || !Q_stricmp(com_gamedir, "cstrike_beta"))
-		return "Counter-Strike";
-
-	else if (!Q_stricmp(com_gamedir, "valve"))
-		return "Half-Life";
-
-	else if (!Q_stricmp(com_gamedir, "ricochet"))
-		return "Ricochet";
-
-	else if (!Q_stricmp(com_gamedir, "dod"))
-		return "Day of Defeat";
-
-	else if (!Q_stricmp(com_gamedir, "tfc"))
-		return "Team Fortress Classic";
-
-	else if (!Q_stricmp(com_gamedir, "dmc"))
-		return "Deathmatch Classic";
-
-	else if (!Q_stricmp(com_gamedir, "czero"))
-		return "Condition Zero";
-
-	return "Half-Life";
+	return "Master Sword: Rebirth";
 }
 
 NOXREF void SetRateRegistrySetting(const char *pchRate)

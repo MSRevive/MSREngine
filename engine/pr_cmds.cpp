@@ -919,7 +919,7 @@ edict_t* EXT_FUNC CreateNamedEntity(int className)
 
 void EXT_FUNC PF_Remove_I(edict_t *ed)
 {
-	g_RehldsHookchains.m_PF_Remove_I.callChain(PF_Remove_I_internal, ed);
+	PF_Remove_I_internal(ed);
 }
 
 void EXT_FUNC PF_Remove_I_internal(edict_t *ed)
@@ -1124,7 +1124,7 @@ void EXT_FUNC EV_PlayReliableEvent_api(IGameClient *cl, int entindex, unsigned s
 
 void EV_PlayReliableEvent(client_t *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs)
 {
-	g_RehldsHookchains.m_EV_PlayReliableEvent.callChain(EV_PlayReliableEvent_api, GetRehldsApiClient(cl), entindex, eventindex, delay, pargs);
+	EV_PlayReliableEvent_api(GetRehldsApiClient(cl), entindex, eventindex, delay, pargs);
 }
 
 void EV_PlayReliableEvent_internal(client_t *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs)
@@ -1944,7 +1944,7 @@ void EXT_FUNC PF_crosshairangle_I(const edict_t *clientent, float pitch, float y
 
 edict_t *EXT_FUNC PF_CreateFakeClient_I(const char *netname)
 {
-	return g_RehldsHookchains.m_CreateFakeClient.callChain(CreateFakeClient_internal, netname);
+	return CreateFakeClient_internal(netname);
 }
 
 edict_t *EXT_FUNC CreateFakeClient_internal(const char *netname)
@@ -2561,7 +2561,7 @@ const char* EXT_FUNC PF_GetPlayerAuthId(edict_t *e)
 
 void EXT_FUNC PF_BuildSoundMsg_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
 {
-	g_RehldsHookchains.m_PF_BuildSoundMsg_I.callChain(PF_BuildSoundMsg_I_internal, entity, channel, sample, volume, attenuation, fFlags, pitch, msg_dest, msg_type, pOrigin, ed);
+	PF_BuildSoundMsg_I_internal(entity, channel, sample, volume, attenuation, fFlags, pitch, msg_dest, msg_type, pOrigin, ed);
 }
 
 void EXT_FUNC PF_BuildSoundMsg_I_internal(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)

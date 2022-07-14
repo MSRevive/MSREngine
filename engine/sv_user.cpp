@@ -129,7 +129,7 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 		if (!Q_memcmp(resbuffer, nullbuffer, sizeof(resbuffer)))
 		{
 			uint32 hash = MSG_ReadBits(32);
-			if (g_RehldsHookchains.m_SV_CheckConsistencyResponse.callChain(SV_CheckConsistencyResponse_API, GetRehldsApiClient(pSenderClient), r, hash))
+			if (SV_CheckConsistencyResponse_API(GetRehldsApiClient(pSenderClient), r, hash))
 				c = idx + 1;
 		}
 		else
@@ -249,7 +249,7 @@ qboolean EXT_FUNC SV_FileInConsistencyList(const char *filename, consistency_t *
 
 int SV_TransferConsistencyInfo(void)
 {
-	return g_RehldsHookchains.m_SV_TransferConsistencyInfo.callChain(SV_TransferConsistencyInfo_internal);
+	return SV_TransferConsistencyInfo_internal();
 }
 
 int EXT_FUNC SV_TransferConsistencyInfo_internal(void)
@@ -328,7 +328,7 @@ bool EXT_FUNC SV_ShouldSendConsistencyList_mod(IGameClient *cl, bool forceConsis
 
 bool SV_ShouldSendConsistencyList(client_t *client, bool forceConsistency)
 {
-	return g_RehldsHookchains.m_SV_ShouldSendConsistencyList.callChain(SV_ShouldSendConsistencyList_mod, GetRehldsApiClient(client), forceConsistency);
+	return SV_ShouldSendConsistencyList_mod(GetRehldsApiClient(client), forceConsistency);
 }
 
 void SV_SendConsistencyList(sizebuf_t *msg)
@@ -1497,7 +1497,7 @@ void EXT_FUNC SV_EstablishTimeBase_mod(IGameClient *cl, usercmd_t *cmds, int dro
 
 void SV_EstablishTimeBase(client_t *cl, usercmd_t *cmds, int dropped, int numbackup, int numcmds)
 {
-	return g_RehldsHookchains.m_SV_EstablishTimeBase.callChain(SV_EstablishTimeBase_mod, GetRehldsApiClient(cl), cmds, dropped, numbackup, numcmds);
+	return SV_EstablishTimeBase_mod(GetRehldsApiClient(cl), cmds, dropped, numbackup, numcmds);
 }
 
 void SV_EstablishTimeBase_internal(client_t *cl, usercmd_t *cmds, int dropped, int numbackup, int numcmds)
@@ -1783,10 +1783,7 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, uint8 opcode) {
 	client_t* cl = client->GetClient();
 	if (opcode < clc_bad || opcode > clc_cvarvalue2)
 	{
-		// TODO: Are we forced to use msg_badread for break the loop.
-		static_assert(REHLDS_API_VERSION_MAJOR <= 3, "Bump major API DETECTED!! You shall rework the hookchain, make function returnable");
 		msg_badread = 1;
-
 		Con_Printf("SV_ReadClientMessage: unknown command char (%d)\n", opcode);
 		SV_DropClient(cl, FALSE, "Bad command character in client command");
 		return;
@@ -1847,7 +1844,7 @@ void SV_ExecuteClientMessage(client_t *cl)
 		if (c == -1)
 			return;
 
-		g_RehldsHookchains.m_HandleNetCommand.callChain(SV_HandleClientMessage_api, apiClient, c);
+		SV_HandleClientMessage_api(apiClient, c);
 
 #ifdef REHLDS_FIXES
 		// FIXED: Don't handle remaining packets if got dropclient above

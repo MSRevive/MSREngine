@@ -156,3 +156,15 @@ CSteam3Server *Steam3Server();
 CSteam3Client *Steam3Client();
 void Master_SetMaster_f();
 void Steam_HandleIncomingPacket(byte *data, int len, int fromip, uint16 port);
+
+class CSteamAPIContext;
+class CSteamGameServerAPIContext;
+
+extern CSteamAPIContext* steamapicontext;
+extern CSteamGameServerAPIContext* steamgameserverapicontext;
+
+extern bool StartupSteamClient(void);
+extern bool StartupSteamServer(uint32 unIP, uint16 usSteamPort, uint16 usGamePort, uint16 usQueryPort, EServerMode eServerMode, const char* pchVersionString);
+
+extern void ShutdownSteamClient(void);
+extern void ShutdownSteamServer(void);

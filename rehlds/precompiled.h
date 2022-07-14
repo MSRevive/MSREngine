@@ -29,8 +29,6 @@
 #include "utlbuffer.h"
 #include "utlrbtree.h"
 
-// Testsuite
-#include "osconfig.h"
 #include "memory.h"
 #include "rehlds/platform.h"
 
@@ -39,17 +37,14 @@
 #include "sys_linuxwnd.h"
 
 #include "iengine.h"
-#include "hookchains_impl.h"
+#include <vector>
+#include "cmd_rehlds.h"
+#include "model.h"
+#include "ObjectList.h"
+#include "pr_dlls.h"
 #include "rehlds_interfaces.h"
 #include "rehlds_interfaces_impl.h"
-#include "rehlds_api.h"
-#include "rehlds_api_impl.h"
-#include "FlightRecorderImpl.h"
-#include "flight_recorder.h"
 #include "rehlds_security.h"
 
 #include "dlls/cdll_dll.h"
 #include "hltv.h"
-
-const int TESTSUITE_PROTOCOL_VERSION_MINOR = 5;
-const int TESTSUITE_PROTOCOL_VERSION_MAJOR = 0;

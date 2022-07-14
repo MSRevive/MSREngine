@@ -29,7 +29,7 @@ ifeq ($(OS),Darwin)
 endif
 
 ifeq ($(CFG), release)
-	OptimizerLevel_CompilerSpecific = -O2 -fno-strict-aliasing -fno-omit-frame-pointer -ftree-vectorize
+	OptimizerLevel_CompilerSpecific = -O2 -fno-strict-aliasing -ffast-math -fno-omit-frame-pointer -ftree-vectorize
 	ifeq ($(CLANG_BUILD),1)
 		# These aren't supported wit Clang 3.5. Need to remove when we update that.
 		OptimizerLevel_CompilerSpecific += -fpredictive-commoning -funswitch-loops
@@ -40,12 +40,6 @@ else
 	OptimizerLevel_CompilerSpecific = -O0
 	#-O1 -finline-functions
 endif
-
-# When we move to a modern toolchain, this will be necessary for early testing
-# until we can ensure that every user has libraries built against the new C++11
-# ABI. Further reading here:
-# https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html
-DEFINES += -D_GLIBCXX_USE_CXX11_ABI=0
 
 # CPPFLAGS == "c/c++ *preprocessor* flags" - not "cee-plus-plus flags"
 ARCH_FLAGS = 
@@ -61,7 +55,7 @@ CFLAGS = $(BASE_CFLAGS) $(ENV_CFLAGS)
 ifeq ($(CLANG_BUILD),1)
 	CXXFLAGS = $(BASE_CFLAGS) -std=gnu++14 -Wno-c++11-narrowing -Wno-dangling-else $(ENV_CXXFLAGS)
 else
-	CXXFLAGS = $(BASE_CFLAGS) -std=gnu++14 -fpermissive $(ENV_CXXFLAGS)
+	CXXFLAGS = $(BASE_CFLAGS) -std=gnu++0x -fpermissive $(ENV_CXXFLAGS)
 endif
 DEFINES += -DVPROF_LEVEL=1 -DGNUC -DNO_HOOK_MALLOC -DNO_MALLOC_OVERRIDE
 
@@ -76,7 +70,7 @@ COPY_DLL_TO_SRV = 0
 LDFLAGS += -Wl,--build-id
 
 export STEAM_RUNTIME_PATH := /usr
-GCC_VER = -5
+GCC_VER = -4.8
 P4BIN = p4
 
 ifeq ($(TARGET_PLATFORM),linux64)
@@ -97,9 +91,9 @@ endif
 ifeq ($(CLANG_BUILD),1)
 	# Clang does not support -mfpmath=sse because it uses whatever
 	# instruction set extensions are available by default.
-	SSE_GEN_FLAGS = -msse3
+	SSE_GEN_FLAGS = -msse2
 else
-	SSE_GEN_FLAGS = -msse3 -mfpmath=sse
+	SSE_GEN_FLAGS = -msse2 -mfpmath=sse
 endif
 
 CCACHE := $(SRCROOT)/devtools/bin/linux/ccache
@@ -135,7 +129,7 @@ endif
 
 ifeq ($(CLANG_BUILD),1)
 	# Clang specific flags
-else ifeq ($(GCC_VER),-5)
+else ifeq ($(GCC_VER),-4.8)
 	WARN_FLAGS += -Wno-unused-local-typedefs
 	WARN_FLAGS += -Wno-unused-result
 	WARN_FLAGS += -Wno-narrowing
@@ -173,7 +167,7 @@ VSIGN ?= true
 
 LINK_MAP_FLAGS = -Wl,-Map,$(@:.so=).map
 
-SHLIBLDFLAGS = -shared $(LDFLAGS) -Wl,-rpath,'$ORIGIN/.'
+SHLIBLDFLAGS = -shared $(LDFLAGS) -Wl,--no-undefined
 
 LIB_START_EXE = -static-libgcc -Wl,--start-group
 LIB_END_EXE = -Wl,--end-group -lm -ldl $(LIBSTDCXX) -lpthread 

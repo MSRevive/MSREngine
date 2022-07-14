@@ -38,14 +38,15 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR;$SRCDIR\rehlds;$SRCDIR\common;$SRCDIR\public;$SRCDIR\engine;$SRCDIR\movement;$SRCDIR\public\rehlds;$SRCDIR\utils"
-		$PreprocessorDefinitions		"$BASE;REHLDS_API;REHLDS_FIXES;REHLDS_SSE;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS" [$WIN32]
-		$PreprocessorDefinitions		"$BASE;SWDS;REHLDS_JIT;REHLDS_SSE;REHLDS_FIXES;REHLDS_CHECKS;REHLDS_API;REHLDS_SELF;REHLDS_OPT_PEDANTIC;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;_stricmp=strcasecmp;_strnicmp=strncasecmp;_strdup=strdup;_unlink=unlink;_vsnprintf=vsnprintf;_vsnwprintf=vswprintf;_LINUX;LINUX" [$POSIX]
+		$PreprocessorDefinitions		"$BASE;REHLDS_FIXES;VERSION_SAFE_STEAM_API_INTERFACES;REHLDS_SSE;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS" [$WIN32]
+		$PreprocessorDefinitions		"$BASE;SWDS;REHLDS_JIT;VERSION_SAFE_STEAM_API_INTERFACES;REHLDS_FIXES;REHLDS_CHECKS;REHLDS_SELF;REHLDS_OPT_PEDANTIC;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;_stricmp=strcasecmp;_strnicmp=strncasecmp;_strdup=strdup;_unlink=unlink;_vsnprintf=vsnprintf;_vsnwprintf=vswprintf;_LINUX;LINUX" [$POSIX]
 		$EnableC++Exceptions			"Yes (/EHsc)"
 	}
 
 	$Linker
 	{
 		$AdditionalDependencies			"$BASE psapi.lib ws2_32.lib" [$WIN32]
+		$SystemLibraries				"rt;m" [$LINUXALL]
 	}
 }
 
@@ -306,8 +307,6 @@ $Project "ReHLDS"
 				$File "$SRCDIR\public\rehlds\d_local.h"
 				$File "$SRCDIR\public\rehlds\edict.h"
 				$File "$SRCDIR\public\rehlds\eiface.h"
-				$File "$SRCDIR\public\rehlds\FlightRecorder.h"
-				$File "$SRCDIR\public\rehlds\hookchains.h"
 				$File "$SRCDIR\public\rehlds\keydefs.h"
 				$File "$SRCDIR\public\rehlds\maintypes.h"
 				$File "$SRCDIR\public\rehlds\model.h"
@@ -315,7 +314,6 @@ $Project "ReHLDS"
 				$File "$SRCDIR\public\rehlds\osconfig.h"
 				$File "$SRCDIR\public\rehlds\progdefs.h"
 				$File "$SRCDIR\public\rehlds\progs.h"
-				$File "$SRCDIR\public\rehlds\rehlds_api.h"
 				$File "$SRCDIR\public\rehlds\rehlds_interfaces.h"
 				$File "$SRCDIR\public\rehlds\Sequence.h"
 				$File "$SRCDIR\public\rehlds\shake.h"
@@ -384,24 +382,16 @@ $Project "ReHLDS"
 		$Folder	"rehlds"
 		{
 			$File "$SRCDIR\rehlds\public_amalgamation_rehlds.cpp" [$POSIX]
-			$File "$SRCDIR\rehlds\FlightRecorderImpl.cpp"
-			$File "$SRCDIR\rehlds\flight_recorder.cpp"
 			$File "$SRCDIR\rehlds\main.cpp"
 			$File "$SRCDIR\rehlds\memory.cpp" [$WIN32]
-			$File "$SRCDIR\rehlds\rehlds_api_impl.cpp"
 			$File "$SRCDIR\rehlds\rehlds_interfaces_impl.cpp"
-			$File "$SRCDIR\rehlds\hookchains_impl.cpp"
 			$File "$SRCDIR\rehlds\platform.cpp"
 			$File "$SRCDIR\rehlds\rehlds_security.cpp"
 			$File "$SRCDIR\rehlds\structSizeCheck.cpp" [$WIN32]
 			$File "$SRCDIR\rehlds\engine.h"
-			$File "$SRCDIR\rehlds\FlightRecorderImpl.h"
-			$File "$SRCDIR\rehlds\flight_recorder.h"
-			$File "$SRCDIR\rehlds\hookchains_impl.h"
 			$File "$SRCDIR\rehlds\memory.h" [$WIN32]
 			$File "$SRCDIR\rehlds\platform.h"
 			$File "$SRCDIR\rehlds\precompiled.h"
-			$File "$SRCDIR\rehlds\rehlds_api_impl.h"
 			$File "$SRCDIR\rehlds\rehlds_interfaces_impl.h"
 			$File "$SRCDIR\rehlds\rehlds_security.h"
 		}		
@@ -412,8 +402,6 @@ $Project "ReHLDS"
 		$Lib 	bzip2
 		$Lib 	libaelf32 [$LINUXALL]
 		$Lib	libacof32 [$WIN32]
-		$ImpLibexternal m [$LINUXALL]
-		$ImpLibexternal rt [$LINUXALL]
 		$ImpLibexternal steam_api
 	}	
 }

@@ -38,7 +38,7 @@ void ED_ClearEdict(edict_t *e)
 
 edict_t *ED_Alloc(void)
 {
-	return g_RehldsHookchains.m_ED_Alloc.callChain(ED_Alloc_internal);
+	return ED_Alloc_internal();
 }
 
 edict_t *EXT_FUNC ED_Alloc_internal(void)
@@ -77,7 +77,7 @@ edict_t *EXT_FUNC ED_Alloc_internal(void)
 
 void ED_Free(edict_t *ed)
 {
-	g_RehldsHookchains.m_ED_Free.callChain(ED_Free_internal, ed);	
+	ED_Free_internal(ed);
 }
 
 void EXT_FUNC ED_Free_internal(edict_t *ed)
@@ -502,12 +502,6 @@ void* EXT_FUNC PvAllocEntPrivateData(edict_t *pEdict, int32 cb)
 
 	pEdict->pvPrivateData = Mem_Calloc(1, cb);
 
-#ifdef REHLDS_FLIGHT_REC
-	if (rehlds_flrec_pvdata.string[0] != '0') {
-		FR_AllocEntPrivateData(pEdict->pvPrivateData, cb);
-	}
-#endif // REHLDS_FLIGHT_REC
-
 	return pEdict->pvPrivateData;
 }
 
@@ -529,12 +523,6 @@ void EXT_FUNC FreeEntPrivateData(edict_t *pEdict)
 		{
 			gNewDLLFunctions.pfnOnFreeEntPrivateData(pEdict);
 		}
-
-#ifdef REHLDS_FLIGHT_REC
-		if (rehlds_flrec_pvdata.string[0] != '0') {
-			FR_FreeEntPrivateData(pEdict->pvPrivateData);
-		}
-#endif // REHLDS_FLIGHT_REC
 
 		Mem_Free(pEdict->pvPrivateData);
 		pEdict->pvPrivateData = 0;

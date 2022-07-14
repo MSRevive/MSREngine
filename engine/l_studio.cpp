@@ -86,5 +86,5 @@ void EXT_FUNC Mod_LoadStudioModel_internal(model_t * mod, void * buffer)
 }
 
 void Mod_LoadStudioModel(model_t * mod, void * buffer) {
-	g_RehldsHookchains.m_Mod_LoadStudioModel.callChain(&Mod_LoadStudioModel_internal, mod, buffer);
+	Mod_LoadStudioModel_internal(mod, buffer);
 }

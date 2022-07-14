@@ -636,7 +636,7 @@ void SV_StartParticle(const vec_t *org, const vec_t *dir, int color, int count)
 
 void SV_StartSound(int recipients, edict_t *entity, int channel, const char *sample, int volume, float attenuation, int fFlags, int pitch)
 {
-	g_RehldsHookchains.m_SV_StartSound.callChain(SV_StartSound_internal, recipients, entity, channel, sample, volume, attenuation, fFlags, pitch);
+	SV_StartSound_internal(recipients, entity, channel, sample, volume, attenuation, fFlags, pitch);
 }
 
 void EXT_FUNC SV_StartSound_internal(int recipients, edict_t *entity, int channel, const char *sample, int volume, float attenuation, int fFlags, int pitch)
@@ -1079,7 +1079,7 @@ void EXT_FUNC SV_SendServerinfo_mod(sizebuf_t *msg, IGameClient* cl)
 
 void SV_SendServerinfo(sizebuf_t *msg, client_t *client)
 {
-	g_RehldsHookchains.m_SV_SendServerinfo.callChain(SV_SendServerinfo_mod, msg, GetRehldsApiClient(client));
+	SV_SendServerinfo_mod(msg, GetRehldsApiClient(client));
 }
 
 void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
@@ -1593,7 +1593,7 @@ void SV_SendRes_f(void)
 
 void SV_Spawn_f(void)
 {
-	g_RehldsHookchains.m_SV_Spawn_f.callChain(SV_Spawn_f_internal);
+	SV_Spawn_f_internal();
 }
 
 void EXT_FUNC SV_Spawn_f_internal(void)
@@ -1763,7 +1763,7 @@ qboolean EXT_FUNC SV_FilterUser(USERID_t *userid)
 
 int SV_CheckProtocol(netadr_t *adr, int nProtocol)
 {
-	return g_RehldsHookchains.m_SV_CheckProtocol.callChain(SV_CheckProtocol_internal, adr, nProtocol);
+	return SV_CheckProtocol_internal(adr, nProtocol);
 }
 
 int EXT_FUNC SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
@@ -1879,7 +1879,7 @@ int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 
 int SV_CheckIPRestrictions(netadr_t *adr, int nAuthProtocol)
 {
-	return g_RehldsHookchains.m_SV_CheckIPRestrictions.callChain(SV_CheckIPRestrictions_internal, adr, nAuthProtocol);
+	return SV_CheckIPRestrictions_internal(adr, nAuthProtocol);
 }
 
 int EXT_FUNC SV_CheckIPRestrictions_internal(netadr_t *adr, int nAuthProtocol)
@@ -1927,7 +1927,7 @@ int SV_CheckIPConnectionReuse(netadr_t *adr)
 
 int SV_FinishCertificateCheck(netadr_t *adr, int nAuthProtocol, char *szRawCertificate, char *userinfo)
 {
-	return g_RehldsHookchains.m_SV_FinishCertificateCheck.callChain(SV_FinishCertificateCheck_internal, adr, nAuthProtocol, szRawCertificate, userinfo);
+	return SV_FinishCertificateCheck_internal(adr, nAuthProtocol, szRawCertificate, userinfo);
 }
 
 int EXT_FUNC SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol, char *szRawCertificate, char *userinfo)
@@ -1967,7 +1967,7 @@ int EXT_FUNC SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol
 
 int SV_CheckKeyInfo(netadr_t *adr, char *protinfo, unsigned short *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
 {
-	return g_RehldsHookchains.m_SV_CheckKeyInfo.callChain(SV_CheckKeyInfo_internal, adr, protinfo, port, pAuthProtocol, pszRaw, cdkey);
+	return SV_CheckKeyInfo_internal(adr, protinfo, port, pAuthProtocol, pszRaw, cdkey);
 }
 
 int EXT_FUNC SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, unsigned short *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
@@ -2260,7 +2260,7 @@ int SV_FindEmptySlot(netadr_t *adr, int *pslot, client_t ** ppClient)
 
 void SV_ConnectClient(void)
 {
-	g_RehldsHookchains.m_SV_ConnectClient.callChain(SV_ConnectClient_internal);
+	SV_ConnectClient_internal();
 }
 
 void EXT_FUNC SV_ConnectClient_internal(void)
@@ -2521,8 +2521,6 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 
 	//Rehlds Security
 	Rehlds_Security_ClientConnected(host_client - g_psvs.clients);
-
-	g_RehldsHookchains.m_ClientConnected.callChain(NULL, GetRehldsApiClient(host_client));
 }
 
 void SVC_Ping(void)
@@ -2598,15 +2596,13 @@ void SVC_GetChallenge(void)
 	int challenge = SV_GetChallenge(net_from);
 
 	if (steam)
-		Q_snprintf(data, sizeof(data), "\xFF\xFF\xFF\xFF%c00000000 %u 3 %lld %d\n", S2C_CHALLENGE, challenge, g_RehldsHookchains.m_Steam_GSGetSteamID.callChain(Steam_GSGetSteamID), Steam_GSBSecure());
+		Q_snprintf(data, sizeof(data), "\xFF\xFF\xFF\xFF%c00000000 %u 3 %lld %d\n", S2C_CHALLENGE, challenge, Steam_GSGetSteamID(), Steam_GSBSecure());
 	else
 	{
 		Con_DPrintf("Server requiring authentication\n");
 		Q_snprintf(data, sizeof(data), "\xFF\xFF\xFF\xFF%c00000000 %u 2\n", S2C_CHALLENGE, challenge);
 	}
 
-	// Give 3-rd party plugins a chance to modify challenge response
-	g_RehldsHookchains.m_SVC_GetChallenge_mod.callChain(NULL, data, challenge);
 	NET_SendPacket(NS_SERVER, Q_strlen(data) + 1, data, net_from);
 }
 
@@ -3673,14 +3669,14 @@ void SV_ReadPackets(void)
 		}
 #endif
 
-		bool pass = g_RehldsHookchains.m_PreprocessPacket.callChain(NET_GetPacketPreprocessor, net_message.data, net_message.cursize, net_from);
+		bool pass = NET_GetPacketPreprocessor(net_message.data, net_message.cursize, net_from);
 		if (!pass)
 			continue;
 
 		if (*(uint32 *)net_message.data == 0xFFFFFFFF)
 		{
 			// Connectionless packet
-			if (g_RehldsHookchains.m_SV_CheckConnectionLessRateLimits.callChain([](netadr_t& net_from, const uint8_t *, int) { return SV_CheckConnectionLessRateLimits(net_from); }, net_from, net_message.data, net_message.cursize))
+			if (SV_CheckConnectionLessRateLimits(net_from))
 			{
 #ifdef REHLDS_FIXES
 				if (SV_FilterPacket())
@@ -3869,7 +3865,7 @@ void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
 	Info_RemovePrefixedKeys(info, '_');
 #endif // REHLDS_FIXES
 
-	g_RehldsHookchains.m_SV_WriteFullClientUpdate.callChain(SV_WriteFullClientUpdate_internal, GetRehldsApiClient(cl), info, MAX_INFO_STRING, sb, GetRehldsApiClient((sb == &g_psv.reliable_datagram) ? nullptr : host_client));
+	SV_WriteFullClientUpdate_internal(GetRehldsApiClient(cl), info, MAX_INFO_STRING, sb, GetRehldsApiClient((sb == &g_psv.reliable_datagram) ? nullptr : host_client));
 }
 
 void EXT_FUNC SV_EmitEvents_api(IGameClient *cl, packet_entities_t *pack, sizebuf_t *ms)
@@ -3879,7 +3875,7 @@ void EXT_FUNC SV_EmitEvents_api(IGameClient *cl, packet_entities_t *pack, sizebu
 
 void SV_EmitEvents(client_t *cl, packet_entities_t *pack, sizebuf_t *ms)
 {
-	g_RehldsHookchains.m_SV_EmitEvents.callChain(SV_EmitEvents_api, GetRehldsApiClient(cl), pack, ms);
+	SV_EmitEvents_api(GetRehldsApiClient(cl), pack, ms);
 }
 
 void SV_EmitEvents_internal(client_t *cl, packet_entities_t *pack, sizebuf_t *msg)
@@ -4292,7 +4288,7 @@ int EXT_FUNC SV_CreatePacketEntities_api(sv_delta_t type, IGameClient *client, p
 
 int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t *to, sizebuf_t *msg)
 {
-	return g_RehldsHookchains.m_SV_CreatePacketEntities.callChain(SV_CreatePacketEntities_api, type, GetRehldsApiClient(client), to, msg);
+	return SV_CreatePacketEntities_api(type, GetRehldsApiClient(client), to, msg);
 }
 
 int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_entities_t *to, sizebuf_t *msg)
@@ -4572,7 +4568,7 @@ void EXT_FUNC SV_EmitPings_hook(IGameClient *cl, sizebuf_t *msg)
 }
 
 void SV_EmitPings(client_t *client, sizebuf_t *msg) {
-	g_RehldsHookchains.m_SV_EmitPings.callChain(SV_EmitPings_hook, GetRehldsApiClient(client), msg);
+	SV_EmitPings_hook(GetRehldsApiClient(client), msg);
 }
 
 void EXT_FUNC SV_EmitPings_internal(client_t *client, sizebuf_t *msg)
@@ -5515,7 +5511,7 @@ void SV_PropagateCustomizations(void)
 
 void SV_WriteVoiceCodec(sizebuf_t *pBuf)
 {
-	g_RehldsHookchains.m_SV_WriteVoiceCodec.callChain(SV_WriteVoiceCodec_internal, pBuf);
+	SV_WriteVoiceCodec_internal(pBuf);
 }
 
 void EXT_FUNC SV_WriteVoiceCodec_internal(sizebuf_t *pBuf)
@@ -5826,7 +5822,7 @@ void MoveCheckedResourcesToFirstPositions()
 
 void SV_ActivateServer(int runPhysics)
 {
-	g_RehldsHookchains.m_SV_ActivateServer.callChain(SV_ActivateServer_internal, runPhysics);
+	SV_ActivateServer_internal(runPhysics);
 }
 
 void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
@@ -6658,8 +6654,7 @@ void SV_BanId_f(void)
 	userfilters[i].banTime = banTime;
 	userfilters[i].banEndTime = (banTime == 0.0f) ? 0.0f : banTime * 60.0f + realtime;
 
-	// give 3-rd party plugins a chance to serialize ID
-	g_RehldsHookchains.m_SerializeSteamId.callChain(SV_SerializeSteamid, id, &userfilters[i].userid);
+	SV_SerializeSteamid(id, &userfilters[i].userid);
 
 	if (banTime == 0.0f)
 		Q_sprintf(szreason, "permanently");
@@ -7785,7 +7780,7 @@ void SV_CheckMapDifferences(void)
 
 void SV_Frame()
 {
-	g_RehldsHookchains.m_SV_Frame.callChain(SV_Frame_Internal);
+	SV_Frame_Internal();
 }
 
 void EXT_FUNC SV_Frame_Internal()
@@ -8083,7 +8078,7 @@ void SV_Shutdown(void)
 
 qboolean SV_CompareUserID(USERID_t *id1, USERID_t *id2)
 {
-	return g_RehldsHookchains.m_SV_CompareUserID.callChain(SV_CompareUserID_internal, id1, id2);
+	return SV_CompareUserID_internal(id1, id2);
 }
 
 qboolean EXT_FUNC SV_CompareUserID_internal(USERID_t *id1, USERID_t *id2)
@@ -8111,7 +8106,7 @@ qboolean EXT_FUNC SV_CompareUserID_internal(USERID_t *id1, USERID_t *id2)
 
 char* SV_GetIDString(USERID_t *id)
 {
-	return g_RehldsHookchains.m_SV_GetIDString.callChain(SV_GetIDString_internal, id);
+	return SV_GetIDString_internal(id);
 }
 
 char* EXT_FUNC SV_GetIDString_internal(USERID_t *id)

@@ -1252,7 +1252,7 @@ float RadiusFromBounds(vec_t *mins, vec_t *maxs)
 
 void Mod_LoadBrushModel(model_t *mod, void *buffer)
 {
-	g_RehldsHookchains.m_Mod_LoadBrushModel.callChain(&Mod_LoadBrushModel_internal, mod, buffer);
+	Mod_LoadBrushModel_internal(mod, buffer);
 }
 
 void EXT_FUNC Mod_LoadBrushModel_internal(model_t *mod, void *buffer)

@@ -421,7 +421,7 @@ void EXT_FUNC SV_DropClient_api(IGameClient* cl, bool crash, const char* fmt, ..
 	Q_vsnprintf(buf, ARRAYSIZE(buf) - 1, fmt, argptr);
 	va_end(argptr);
 
-	g_RehldsHookchains.m_SV_DropClient.callChain(SV_DropClient_hook, cl, crash, buf);
+	SV_DropClient_hook(cl, crash, buf);
 }
 
 void SV_DropClient(client_t *cl, qboolean crash, const char *fmt, ...)
@@ -433,7 +433,7 @@ void SV_DropClient(client_t *cl, qboolean crash, const char *fmt, ...)
 	Q_vsnprintf(buf, ARRAYSIZE(buf) - 1, fmt, argptr);
 	va_end(argptr);
 
-	g_RehldsHookchains.m_SV_DropClient.callChain(SV_DropClient_hook, GetRehldsApiClient(cl), crash != FALSE, buf);
+	SV_DropClient_hook(GetRehldsApiClient(cl), crash != FALSE, buf);
 }
 
 void SV_DropClient_internal(client_t *cl, qboolean crash, const char *string)
@@ -861,13 +861,6 @@ void _Host_Frame(float time)
 	if (!Host_FilterTime(time))
 		return;
 
-#ifdef REHLDS_FLIGHT_REC
-	static long frameCounter = 0;
-	if (rehlds_flrec_frame.string[0] != '0') {
-		FR_StartFrame(frameCounter);
-	}
-#endif //REHLDS_FLIGHT_REC
-
 	SystemWrapper_RunFrame(host_frametime);
 
 	if (g_modfuncs.m_pfnFrameBegin)
@@ -928,13 +921,6 @@ void _Host_Frame(float time)
 
 	//Rehlds Security
 	Rehlds_Security_Frame();
-
-#ifdef REHLDS_FLIGHT_REC
-	if (rehlds_flrec_frame.string[0] != '0') {
-		FR_EndFrame(frameCounter);
-	}
-	frameCounter++;
-#endif //REHLDS_FLIGHT_REC
 }
 
 int Host_Frame(float time, int iState, int *stateInfo)
@@ -1105,16 +1091,10 @@ int Host_Init(quakeparms_t *parms)
 	Ed_StrPool_Init();
 #endif //REHLDS_FIXES
 
-	FR_Init(); //don't put it under REHLDS_FLIGHT_REC to allow recording via Rehlds API
-
 	Cbuf_Init();
 	Cmd_Init();
 	Cvar_Init();
 	Cvar_CmdInit();
-
-#ifdef REHLDS_FLIGHT_REC
-	FR_Rehlds_Init();
-#endif //REHLDS_FLIGHT_REC
 
 	V_Init();
 	Chase_Init();

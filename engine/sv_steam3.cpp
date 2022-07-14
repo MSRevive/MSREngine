@@ -27,6 +27,43 @@
 */
 
 #include "precompiled.h"
+#include "steam/isteamgameserver.h"
+
+static CSteamAPIContext s_SteamAPIContext;
+CSteamAPIContext* steamapicontext = &s_SteamAPIContext;
+
+static CSteamGameServerAPIContext s_SteamGameServerAPIContext;
+CSteamGameServerAPIContext* steamgameserverapicontext = &s_SteamGameServerAPIContext;
+
+bool StartupSteamClient(void)
+{
+	SteamAPI_SetTryCatchCallbacks(false);
+	s_SteamAPIContext.Clear();
+	const bool res = SteamAPI_InitSafe();
+	s_SteamAPIContext.Init();
+	return res;
+}
+
+void ShutdownSteamClient(void)
+{
+	SteamAPI_Shutdown();
+	s_SteamAPIContext.Clear();
+}
+
+bool StartupSteamServer(uint32 unIP, uint16 usSteamPort, uint16 usGamePort, uint16 usQueryPort, EServerMode eServerMode, const char* pchVersionString)
+{
+	SteamAPI_SetTryCatchCallbacks(false);
+	s_SteamGameServerAPIContext.Clear();
+	const bool res = SteamGameServer_InitSafe(unIP, usSteamPort, usGamePort, usQueryPort, eServerMode, pchVersionString);
+	s_SteamGameServerAPIContext.Init();
+	return res;
+}
+
+void ShutdownSteamServer(void)
+{
+	SteamGameServer_Shutdown();
+	s_SteamGameServerAPIContext.Clear();
+}
 
 void CSteam3Server::OnGSPolicyResponse(GSPolicyResponse_t *pPolicyResponse)
 {
@@ -332,10 +369,9 @@ void CSteam3Server::Shutdown()
 {
 	if (m_bLoggedOn)
 	{
-		SteamGameServer()->EnableHeartbeats(0);
-		SteamGameServer()->LogOff();
-
-		SteamGameServer_Shutdown();
+		steamgameserverapicontext->SteamGameServer()->EnableHeartbeats(0);
+		steamgameserverapicontext->SteamGameServer()->LogOff();
+		ShutdownSteamServer();
 		m_bLoggedOn = false;
 	}
 }
@@ -527,19 +563,19 @@ void CSteam3Client::Shutdown()
 {
 	if (m_bLoggedOn)
 	{
-		SteamAPI_Shutdown();
+		ShutdownSteamClient();
 		m_bLoggedOn = false;
 	}
 }
 
 int CSteam3Client::InitiateGameConnection(void *pData, int cbMaxData, uint64 steamID, uint32 unIPServer, uint16 usPortServer, bool bSecure)
 {
-	return SteamUser()->InitiateGameConnection(pData, cbMaxData, CSteamID(steamID), ntohl(unIPServer), ntohs(usPortServer), bSecure);
+	return steamapicontext->SteamUser()->InitiateGameConnection(pData, cbMaxData, CSteamID(steamID), ntohl(unIPServer), ntohs(usPortServer), bSecure);
 }
 
 void CSteam3Client::TerminateConnection(uint32 unIPServer, uint16 usPortServer)
 {
-	SteamUser()->TerminateGameConnection(ntohl(unIPServer), ntohs(usPortServer));
+	steamapicontext->SteamUser()->TerminateGameConnection(ntohl(unIPServer), ntohs(usPortServer));
 }
 
 void CSteam3Client::InitClient()
@@ -563,7 +599,7 @@ void CSteam3Client::InitClient()
 		}
 	}
 
-	if (!SteamAPI_Init())
+	if (!StartupSteamClient())
 		Sys_Error("Failed to initalize authentication interface. Exiting...\n");
 
 	m_bLogOnResult = false;
@@ -627,14 +663,11 @@ bool Steam_GSBUpdateUserData(uint64 steamIDUser, const char *pchPlayerName, uint
 	return CRehldsPlatformHolder::get()->SteamGameServer()->BUpdateUserData(steamIDUser, pchPlayerName, uScore);
 }
 
-bool ISteamGameServer_BUpdateUserData(uint64 steamid, const char *netname, uint32 score)
+bool ISteamGameServer_BUpdateUserData(uint64 steamid, const char* netname, uint32 score)
 {
 	if (!CRehldsPlatformHolder::get()->SteamGameServer())
-	{
 		return false;
-	}
-
-	return g_RehldsHookchains.m_Steam_GSBUpdateUserData.callChain(Steam_GSBUpdateUserData, steamid, netname, score);
+	return Steam_GSBUpdateUserData(steamid, netname, score);
 }
 
 bool ISteamApps_BIsSubscribedApp(uint32 appid)
@@ -650,10 +683,7 @@ bool ISteamApps_BIsSubscribedApp(uint32 appid)
 
 const char *Steam_GetCommunityName()
 {
-	if (SteamFriends())
-		return SteamFriends()->GetPersonaName();
-
-	return NULL;
+	return (steamapicontext->SteamFriends() ? steamapicontext->SteamFriends()->GetPersonaName() : NULL);
 }
 
 qboolean EXT_FUNC Steam_NotifyClientConnect_api(IGameClient *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
@@ -663,8 +693,7 @@ qboolean EXT_FUNC Steam_NotifyClientConnect_api(IGameClient *cl, const void *pvS
 
 qboolean Steam_NotifyClientConnect(client_t *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
 {
-	return g_RehldsHookchains.m_Steam_NotifyClientConnect
-		.callChain(Steam_NotifyClientConnect_api, GetRehldsApiClient(cl), pvSteam2Key, ucbSteam2Key);
+	return Steam_NotifyClientConnect_api(GetRehldsApiClient(cl), pvSteam2Key, ucbSteam2Key);
 }
 
 qboolean Steam_NotifyClientConnect_internal(client_t *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
@@ -683,7 +712,7 @@ qboolean EXT_FUNC Steam_NotifyBotConnect_api(IGameClient* cl)
 
 qboolean Steam_NotifyBotConnect(client_t *cl)
 {
-	return g_RehldsHookchains.m_Steam_NotifyBotConnect.callChain(Steam_NotifyBotConnect_api, GetRehldsApiClient(cl));
+	return Steam_NotifyBotConnect_api(GetRehldsApiClient(cl));
 }
 
 qboolean Steam_NotifyBotConnect_internal(client_t *cl)
@@ -697,7 +726,7 @@ qboolean Steam_NotifyBotConnect_internal(client_t *cl)
 
 void EXT_FUNC Steam_NotifyClientDisconnect_api(IGameClient* cl)
 {
-	g_RehldsHookchains.m_Steam_NotifyClientDisconnect.callChain(Steam_NotifyClientDisconnect_internal, cl);
+	Steam_NotifyClientDisconnect_internal(cl);
 }
 
 void Steam_NotifyClientDisconnect(client_t *cl)
