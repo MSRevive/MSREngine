@@ -88,9 +88,13 @@
 #include <fstream>
 #include <iomanip>
 
+#ifdef _WIN32 // WINDOWS sse4.1
 #include <smmintrin.h>
-#include <xmmintrin.h>
+#endif
 
+#if defined(__i386__) || defined(_M_IX86)
+#include <xmmintrin.h> // For MMX intrinsics
+#endif
 
 #ifdef _WIN32 // WINDOWS
 	// Define __func__ on VS less than 2015
