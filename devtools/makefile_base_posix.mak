@@ -29,7 +29,7 @@ ifeq ($(OS),Darwin)
 endif
 
 ifeq ($(CFG), release)
-	OptimizerLevel_CompilerSpecific = -O2 -fno-strict-aliasing -ffast-math -fno-omit-frame-pointer -ftree-vectorize
+	OptimizerLevel_CompilerSpecific = -O2 -fno-strict-aliasing -fno-omit-frame-pointer -ftree-vectorize
 	ifeq ($(CLANG_BUILD),1)
 		# These aren't supported wit Clang 3.5. Need to remove when we update that.
 		OptimizerLevel_CompilerSpecific += -fpredictive-commoning -funswitch-loops
