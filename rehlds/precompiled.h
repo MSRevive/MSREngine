@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef _WIN32
-__warndecl(__warn_memset_zero_len, "memset used with constant zero length parameter; this could be due to transposed parameters");
-#endif
-
 #include "appversion.h"
 
 #include "osconfig.h"

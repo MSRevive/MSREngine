@@ -887,7 +887,12 @@ struct Backend
 
 	Backend(void* pbuff = NULL, size_t buffsize = 0) : pbuff_((uint8*) pbuff), buffsize_(buffsize), size_(0)
 	{
+#if defined(_WIN32)
 		memset(pbuff, 0xCC, buffsize);	// INT3
+#else
+		if (buffsize > 0)
+			memset(pbuff, 0xCC, buffsize);	// INT3
+#endif		
 	}
 
 	size_t GetSize() const
