@@ -381,7 +381,6 @@ $Project "ReHLDS"
 
 		$Folder	"rehlds"
 		{
-			//$File "$SRCDIR\rehlds\public_amalgamation_rehlds.cpp" [$POSIX]
 			$File "$SRCDIR\rehlds\main.cpp"
 			$File "$SRCDIR\rehlds\memory.cpp" [$WIN32]
 			$File "$SRCDIR\rehlds\rehlds_interfaces_impl.cpp"
