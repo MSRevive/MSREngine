@@ -39,14 +39,14 @@ $Configuration
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR;$SRCDIR\rehlds;$SRCDIR\common;$SRCDIR\public;$SRCDIR\engine;$SRCDIR\movement;$SRCDIR\public\rehlds;$SRCDIR\utils"
 		$PreprocessorDefinitions		"$BASE;REHLDS_FIXES;VERSION_SAFE_STEAM_API_INTERFACES;REHLDS_SSE;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS" [$WIN32]
-		$PreprocessorDefinitions		"$BASE;SWDS;REHLDS_JIT;VERSION_SAFE_STEAM_API_INTERFACES;REHLDS_FIXES;REHLDS_CHECKS;REHLDS_SELF;REHLDS_OPT_PEDANTIC;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;_stricmp=strcasecmp;_strnicmp=strncasecmp;_strdup=strdup;_unlink=unlink;_vsnprintf=vsnprintf;_vsnwprintf=vswprintf;_LINUX;LINUX" [$POSIX]
+		$PreprocessorDefinitions		"$BASE;SWDS;VERSION_SAFE_STEAM_API_INTERFACES;REHLDS_FIXES;REHLDS_CHECKS;REHLDS_SELF;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;_stricmp=strcasecmp;_strnicmp=strncasecmp;_strdup=strdup;_unlink=unlink;_vsnprintf=vsnprintf;_vsnwprintf=vswprintf;_LINUX;LINUX" [$POSIX]
 		$EnableC++Exceptions			"Yes (/EHsc)"
 	}
 
 	$Linker
 	{
 		$AdditionalDependencies			"$BASE psapi.lib ws2_32.lib" [$WIN32]
-		$SystemLibraries				"rt;m" [$LINUXALL]
+		$SystemLibraries				"rt;m;" [$LINUXALL]
 	}
 }
 
@@ -381,7 +381,7 @@ $Project "ReHLDS"
 
 		$Folder	"rehlds"
 		{
-			$File "$SRCDIR\rehlds\public_amalgamation_rehlds.cpp" [$POSIX]
+			//$File "$SRCDIR\rehlds\public_amalgamation_rehlds.cpp" [$POSIX]
 			$File "$SRCDIR\rehlds\main.cpp"
 			$File "$SRCDIR\rehlds\memory.cpp" [$WIN32]
 			$File "$SRCDIR\rehlds\rehlds_interfaces_impl.cpp"

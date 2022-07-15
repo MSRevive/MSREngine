@@ -41,6 +41,12 @@ else
 	#-O1 -finline-functions
 endif
 
+# When we move to a modern toolchain, this will be necessary for early testing
+# until we can ensure that every user has libraries built against the new C++11
+# ABI. Further reading here:
+# https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html
+DEFINES += -D_GLIBCXX_USE_CXX11_ABI=0
+
 # CPPFLAGS == "c/c++ *preprocessor* flags" - not "cee-plus-plus flags"
 ARCH_FLAGS = 
 BUILDING_MULTI_ARCH = 0
@@ -167,12 +173,12 @@ VSIGN ?= true
 
 LINK_MAP_FLAGS = -Wl,-Map,$(@:.so=).map
 
-SHLIBLDFLAGS = -shared $(LDFLAGS) -Wl,--no-undefined
+SHLIBLDFLAGS = -shared $(LDFLAGS) -Wl,--no-undefined -Wl,-rpath,'$ORIGIN/.'
 
-LIB_START_EXE = -static-libgcc -Wl,--start-group
+LIB_START_EXE = -static-libgcc -static-libstdc++ -Wl,--start-group
 LIB_END_EXE = -Wl,--end-group -lm -ldl $(LIBSTDCXX) -lpthread 
 
-LIB_START_SHLIB = -static-libgcc -Wl,--start-group
+LIB_START_SHLIB = -static-libgcc -static-libstdc++ -Wl,--start-group
 LIB_END_SHLIB = -Wl,--end-group -lm -ldl $(LIBSTDCXXPIC) -lpthread -l:$(LD_SO) -Wl,--version-script=$(SRCROOT)/devtools/version_script.linux.txt
 
 #
