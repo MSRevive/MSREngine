@@ -7,7 +7,7 @@ Run createall to create the solution(s).
 Use VS 2022 or VS 2019, requires c++14.
 
 ### Linux
-Use GCC 5.
+Use GCC 4.8 and up.
 
 ## Troubleshooting
 Please see the [Valve Dev Wiki](https://developer.valvesoftware.com/wiki/Source_SDK_2013#Troubleshooting).
