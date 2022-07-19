@@ -46,7 +46,9 @@ $Configuration
 	$Linker
 	{
 		$AdditionalDependencies			"$BASE psapi.lib ws2_32.lib" [$WIN32]
-		$SystemLibraries				"rt;m;" [$LINUXALL]
+		$SystemLibraries				"rt" [$LINUXALL]
+		$SystemLibraries				"dl" [$LINUXALL]
+		$SystemLibraries				"m" [$LINUXALL]
 	}
 }
 
