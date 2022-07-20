@@ -29,7 +29,6 @@
 #include "utlbuffer.h"
 #include "utlrbtree.h"
 
-#include "memory.h"
 #include "rehlds/platform.h"
 
 #include "bzip2/bzlib.h"

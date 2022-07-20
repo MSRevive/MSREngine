@@ -35,11 +35,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
 	if (fdwReason == DLL_PROCESS_ATTACH)
 	{
-#ifdef _WIN32
-		Module hlds_exe;
-		if (!FindModuleByName("hlds.exe", &hlds_exe))
-			printf("%s: launcher is not hlds.exe, tests playing/recording disabled!\n", __func__);
-#endif
 	}
 	else if (fdwReason == DLL_PROCESS_DETACH)
 	{

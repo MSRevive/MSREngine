@@ -384,13 +384,10 @@ $Project "ReHLDS"
 		$Folder	"rehlds"
 		{
 			$File "$SRCDIR\rehlds\main.cpp"
-			$File "$SRCDIR\rehlds\memory.cpp" [$WIN32]
 			$File "$SRCDIR\rehlds\rehlds_interfaces_impl.cpp"
 			$File "$SRCDIR\rehlds\platform.cpp"
 			$File "$SRCDIR\rehlds\rehlds_security.cpp"
-			$File "$SRCDIR\rehlds\structSizeCheck.cpp" [$WIN32]
 			$File "$SRCDIR\rehlds\engine.h"
-			$File "$SRCDIR\rehlds\memory.h" [$WIN32]
 			$File "$SRCDIR\rehlds\platform.h"
 			$File "$SRCDIR\rehlds\precompiled.h"
 			$File "$SRCDIR\rehlds\rehlds_interfaces_impl.h"
