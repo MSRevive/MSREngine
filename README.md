@@ -4,7 +4,7 @@ Run createall to create the solution(s).
 ## Compiling
 
 ### Windows
-Use VS 2022 or VS 2019, requires c++14.
+Use VS 2022 or VS 2019, requires c++11.
 
 ### Linux
 Use GCC 4.8 and up.
