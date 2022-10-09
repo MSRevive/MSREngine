@@ -349,21 +349,21 @@ void Host_WriteCustomConfig(void)
 #endif // SWDS
 }
 
-void SV_ClientPrintf(const char *fmt, ...)
+void SV_ClientPrintf(const char* fmt, ...)
 {
-	va_list va;
-	char string[1024];
-
 	if (!host_client->fakeclient)
 	{
+		char string[1024], output[1024];
+
+		va_list va;
 		va_start(va, fmt);
 		Q_vsnprintf(string, ARRAYSIZE(string) - 1, fmt, va);
 		va_end(va);
 
-		string[ARRAYSIZE(string) - 1] = 0;
+		Q_strlcpy(output, string, min(strlen(string) + 1, sizeof(output)));
 
 		MSG_WriteByte(&host_client->netchan.message, svc_print);
-		MSG_WriteString(&host_client->netchan.message, string);
+		MSG_WriteString(&host_client->netchan.message, output);
 	}
 }
 
