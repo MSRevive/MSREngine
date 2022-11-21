@@ -5,15 +5,17 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20-04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: C/C++ dev tools
       run: |
+        echo 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial main' | sudo tee --append /etc/apt/sources.list
+        echo 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe' | sudo tee --append /etc/apt/sources.list
         sudo apt update
-        sudo apt-get install build-essential gcc-4.8-multilib g++-4.8-multilib
+        sudo apt-get install build-essential gcc-5-multilib g++-5-multilib
 
     - name: Create makefile
       run: |
@@ -28,7 +30,7 @@ jobs:
       run: make -f engine.mak
 
     - name: Upload Binaries
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Linux Binaries
         path: |
