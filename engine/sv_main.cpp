@@ -164,6 +164,7 @@ cvar_t sv_failuretime = { "sv_failuretime", "0.5", 0, 0.0f, NULL };
 cvar_t sv_cheats = { "sv_cheats", "0", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_password = { "sv_password", "", FCVAR_SERVER | FCVAR_PROTECTED, 0.0f, NULL };
 cvar_t sv_proxies = { "sv_proxies", "1", FCVAR_SERVER, 0.0f, NULL };
+cvar_t sv_crashcfg = { "sv_crashcfg", "crashed", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_outofdatetime = { "sv_outofdatetime", "1800", 0, 0.0f, NULL };
 cvar_t mapchangecfgfile = { "mapchangecfgfile", "", 0, 0.0f, NULL };
 
@@ -7986,6 +7987,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_send_logos);
 	Cvar_RegisterVariable(&sv_send_resources);
 	Cvar_RegisterVariable(&sv_logbans);
+	Cvar_RegisterVariable(&sv_crashcfg);
 	Cvar_RegisterVariable(&hpk_maxsize);
 	Cvar_RegisterVariable(&mapcyclefile);
 	Cvar_RegisterVariable(&motdfile);

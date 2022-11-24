@@ -346,6 +346,7 @@ extern cvar_t sv_failuretime;
 extern cvar_t sv_cheats;
 extern cvar_t sv_password;
 extern cvar_t sv_proxies;
+extern cvar_t sv_crashcfg;
 extern cvar_t sv_outofdatetime;
 extern cvar_t mapchangecfgfile;
 
