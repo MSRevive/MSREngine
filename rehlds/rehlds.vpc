@@ -352,6 +352,20 @@ $Project "ReHLDS"
 				$File "$SRCDIR\public\steam\steam_api.h"
 				$File "$SRCDIR\public\steam\steam_gameserver.h"
 			}
+
+			$Folder "steamapi"
+			{
+				$File "$SRCDIR\steamapi\callbackmgr.cpp"
+				$File "$SRCDIR\steamapi\callbackmgr.h"
+				$File "$SRCDIR\steamapi\clientmodules.cpp"
+				$File "$SRCDIR\steamapi\clientmodules.h"
+				$File "$SRCDIR\steamapi\steam_access_int.cpp"
+				$File "$SRCDIR\steamapi\steam_api_internal.cpp"
+				$File "$SRCDIR\steamapi\steam_api_internal.h"
+				$File "$SRCDIR\steamapi\steam_api.cpp"
+				$File "$SRCDIR\steamapi\steam_contentserver.cpp"
+				$File "$SRCDIR\steamapi\steam_gameserver.cpp"
+			}
 			
 			$Folder	"tier0"
 			{
