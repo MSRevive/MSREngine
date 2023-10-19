@@ -350,7 +350,6 @@ extern cvar_t sv_crashcfg;
 extern cvar_t sv_outofdatetime;
 extern cvar_t mapchangecfgfile;
 
-extern qboolean allow_cheats;
 extern cvar_t mp_logecho;
 extern cvar_t mp_logfile;
 extern cvar_t sv_allow_download;
