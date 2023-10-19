@@ -5989,7 +5989,7 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 		if (gEntityInterface.pfnGetGameDescription != NULL)
 			Cvar_Set("hostname", gEntityInterface.pfnGetGameDescription());
 		else
-			Cvar_Set("hostname", "Half-Life");
+			Cvar_Set("hostname", "Master Sword: Rebirth");
 	}
 
 	scr_centertime_off = 0.0f;
