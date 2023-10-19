@@ -4028,8 +4028,9 @@ void SV_EmitEvents_internal(client_t *cl, packet_entities_t *pack, sizebuf_t *ms
 
 int fatbytes;
 unsigned char fatpvs[MAX_MAP_LEAFS / 8];
+
 int fatpasbytes;
-unsigned char fatpvs[MAX_MAP_LEAFS / 8];
+unsigned char fatpas[MAX_MAP_LEAFS / 8];
 
 void SV_AddToFatPVS(vec_t *org, mnode_t *node)
 {

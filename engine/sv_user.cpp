@@ -517,7 +517,6 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 	edict_t *check;
 	int e;
 	physent_t *ve;
-	int i;
 	link_t *next;
 	float *fmax;
 	float *fmin;
@@ -582,7 +581,7 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 		{
 			if (pmove->numphysent >= MAX_PHYSENTS)
 			{
-				Con_DPrintf("SV_AddLinksToPM:  pmove->numphysent >= MAX_PHYSENTS\n");
+				Con_DPrintf("SV_AddLinksToPM: pmove->numphysent >= MAX_PHYSENTS\n");
 				return;
 			}
 			pe = &pmove->physents[pmove->numphysent++];
@@ -591,7 +590,7 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 		{
 			if (pmove->nummoveent >= MAX_MOVEENTS)
 			{
-				Con_DPrintf("SV_AddLinksToPM:  pmove->nummoveent >= MAX_MOVEENTS\n");
+				Con_DPrintf("SV_AddLinksToPM: pmove->nummoveent >= MAX_MOVEENTS\n");
 				continue;
 			}
 			pe = &pmove->moveents[pmove->nummoveent++];

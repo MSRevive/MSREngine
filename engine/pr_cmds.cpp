@@ -1055,7 +1055,7 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 	}
 
 	//Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
-	Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, resName);
+	Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, s);
 }
 
 unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
@@ -1115,7 +1115,7 @@ unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 		}
 
 		//Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, psz);
-		Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, resName);
+		Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, psz);
 	}
 }
 
@@ -1444,7 +1444,7 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 #endif
 		}
 		//Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
-		Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, resName);
+		Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, s);
 	}
 }
 
@@ -2712,7 +2712,7 @@ void EXT_FUNC PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, cons
 			++cnode;
 			++i;
 			if (i >= 512)
-				Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, resName);
+				Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, filename);
 				//Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, filename);
 		}
 	}
