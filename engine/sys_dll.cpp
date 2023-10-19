@@ -27,6 +27,10 @@
 */
 
 #include "precompiled.h"
+#ifdef _WIN32
+#include <tchar.h>
+#include <wchar.h>
+#endif
 
 void(*Launcher_ConsolePrintf)(char *, ...);
 char *(*Launcher_GetLocalizedString)(unsigned int);
@@ -434,7 +438,20 @@ void NORETURN Sys_Error(const char *error, ...)
 	va_end(argptr);
 
 #ifdef _WIN32
-	MessageBox(GetForegroundWindow(), text, "Fatal error - Dedicated server", MB_ICONERROR | MB_OK);
+	typedef int(__stdcall *MSGBOXWAPI)(IN HWND hWnd, IN LPCWSTR lpText, IN LPCWSTR lpCaption, IN UINT uType, IN WORD wLanguageId, IN DWORD dwMilliseconds);
+
+	HMODULE hUser32 = LoadLibraryA("user32.dll");
+	if (hUser32)
+	{
+		auto MessageBoxTimeout = (MSGBOXWAPI)GetProcAddress(hUser32, "MessageBoxTimeout");
+		wchar_t* bodyBuf = new wchar_t[1024];
+		mbstowcs(bodyBuf, text, 1025);
+		MessageBoxTimeout(GetForegroundWindow(), bodyBuf, L"Fatal error - Dedicated server", MB_ICONERROR | MB_OK, 0, 1500);
+		delete[] bodyBuf;
+		FreeLibrary(hUser32);
+	}
+	else
+		MessageBox(GetForegroundWindow(), text, "Fatal error - Dedicated server", MB_ICONERROR | MB_OK);
 #endif // _WIN32
 
 	if (bReentry)
