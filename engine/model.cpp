@@ -288,8 +288,7 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 	buf = COM_LoadFileForMe(mod->name, &length);
 	if (!buf)
 	{
-		if (crash)
-			Sys_Error("%s: %s not found", __func__, mod->name);
+		Con_Printf("%s: %s not found\n", __func__, mod->name);
 		return 0;
 	}
 
@@ -314,14 +313,14 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 				p->firstCRCDone = 1;
 				p->initialCRC = currentCRC;
 #ifndef REHLDS_FIXES
-				SetCStrikeFlags();
+				//SetCStrikeFlags();
 #endif
-				if (!IsGameSubscribed("czero") && g_eGameType == GT_CStrike && IsCZPlayerModel(currentCRC, mod->name) && g_pcls.state)
-				{
-					COM_ExplainDisconnection(TRUE, "Cannot continue with altered model %s, disconnecting.", mod->name);
-					CL_Disconnect();
-					return 0;
-				}
+				// if (!IsGameSubscribed("czero") && g_eGameType == GT_CStrike && IsCZPlayerModel(currentCRC, mod->name) && g_pcls.state)
+				// {
+				// 	COM_ExplainDisconnection(TRUE, "Cannot continue with altered model %s, disconnecting.", mod->name);
+				// 	CL_Disconnect();
+				// 	return 0;
+				// }
 			}
 		}
 	}
