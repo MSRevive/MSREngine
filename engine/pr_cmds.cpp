@@ -1054,7 +1054,8 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 			return i;
 	}
 
-	Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
+	//Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
+	Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, resName);
 }
 
 unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
@@ -1113,7 +1114,8 @@ unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 				return i;
 		}
 
-		Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, psz);
+		//Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, psz);
+		Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, resName);
 	}
 }
 
@@ -1441,7 +1443,8 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 				return i;
 #endif
 		}
-		Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
+		//Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
+		Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, resName);
 	}
 }
 
@@ -1479,7 +1482,8 @@ int EXT_FUNC PF_precache_generic_I(const char *s)
 	}
 
 	if (g_psv.state != ss_loading)
-		Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, resName);
+		Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, resName);
+		//Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, resName);
 
 	if (resCount >= ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames))
 	{
@@ -1525,10 +1529,11 @@ int EXT_FUNC PF_precache_generic_I(const char *s)
 	{
 		for (int i = 0; i < MAX_GENERIC; i++)
 		{
-			if (!Q_stricmp(g_psv.generic_precache[i], s))
+			if (g_psv.generic_precache[i] && !Q_stricmp(g_psv.generic_precache[i], s))
 				return i;
 		}
-		Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
+		//Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
+		Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, resName);
 	}
 }
 #endif // REHLDS_FIXES
@@ -2707,7 +2712,8 @@ void EXT_FUNC PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, cons
 			++cnode;
 			++i;
 			if (i >= 512)
-				Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, filename);
+				Con_Printf("%s: '%s' Precache can only be done in spawn functions\n", __func__, resName);
+				//Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, filename);
 		}
 	}
 }
