@@ -117,7 +117,7 @@ float VectorNormalize(vec3_t v)
 	float length, ilength;
 	length = Length(v);
 
-	const int res = clamp(0.0, 1.0, 2.0);
+	//const int res = clamp(0.0, 1.0, 2.0);
 
 	if (length)
 	{
@@ -417,6 +417,8 @@ qboolean VectorCompare(const vec_t *v1, const vec_t *v2)
 	return TRUE;
 }
 
+#endif // #if !defined(REHLDS_SSE)
+
 qboolean BoundsIntersect(const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2)
 {
 	if (mins1[0] > maxs2[0] || mins1[1] > maxs2[1] || mins1[2] > maxs2[2])
@@ -425,5 +427,3 @@ qboolean BoundsIntersect(const vec3_t mins1, const vec3_t maxs1, const vec3_t mi
 		return FALSE;
 	return TRUE;
 }
-
-#endif // #if !defined(REHLDS_SSE)
