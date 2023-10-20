@@ -443,7 +443,7 @@ void NORETURN Sys_Error(const char *error, ...)
 	HMODULE hUser32 = LoadLibraryA("user32.dll");
 	if (hUser32)
 	{
-		auto MessageBoxTimeout = (MSGBOXWAPI)GetProcAddress(hUser32, "MessageBoxTimeout");
+		auto MessageBoxTimeout = (MSGBOXWAPI)GetProcAddress(hUser32, "MessageBoxTimeoutW");
 		wchar_t* bodyBuf = new wchar_t[1024];
 		mbstowcs(bodyBuf, text, 1025);
 		MessageBoxTimeout(GetForegroundWindow(), bodyBuf, L"Fatal error - Dedicated server", MB_ICONERROR | MB_OK, 0, 1500);
