@@ -13,11 +13,6 @@ $Project "hlds"
 	"dedicated\dedicated.vpc"
 }
 
-$Project "filesystem_stdio"
-{
-	"filesystem\filesystem.vpc" [$WIN32]
-}
-
 $Project "bzip2"
 {
 	"utils\bzip2\bzip2.vpc" [$WIN32]
@@ -26,4 +21,9 @@ $Project "bzip2"
 $Project "ReHLDS"
 {
 	"rehlds\rehlds.vpc"
+}
+
+$Project "filesystem_stdio"
+{
+	"filesystem\filesystem.vpc"
 }
