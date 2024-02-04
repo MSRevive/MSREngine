@@ -8243,7 +8243,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_send_logos);
 	Cvar_RegisterVariable(&sv_send_resources);
 	Cvar_RegisterVariable(&sv_logbans);
+#ifdef REHLDS_FIXES
 	Cvar_RegisterVariable(&sv_crashcfg);
+#endif
 	Cvar_RegisterVariable(&hpk_maxsize);
 	Cvar_RegisterVariable(&mapcyclefile);
 	Cvar_HookVariable(mapcyclefile.name, &mapcyclefile_hook);
