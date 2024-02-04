@@ -45,7 +45,7 @@
 vec3_t *g_moved_from;
 edict_t **g_moved_edict;
 
-cvar_t sv_maxvelocity = { "sv_maxvelocity", "2000", 0, 0.0f, NULL };
+cvar_t sv_maxvelocity = { "sv_maxvelocity", "5000", 0, 0.0f, NULL };
 cvar_t sv_gravity = { "sv_gravity", "800", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_bounce = { "sv_bounce", "1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_stepsize = { "sv_stepsize", "18", FCVAR_SERVER, 0.0f, NULL };
