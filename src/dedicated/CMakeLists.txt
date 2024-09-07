@@ -16,7 +16,7 @@ source_group("Misc" FILES ${Misc})
 set(Source_Files
 	"../common/commandline.cpp"
 	"dedicated.h"
-	"hlds_exports.cpp"
+	"dedicated_exports.cpp"
 	"precompiled.h"
 	"public_amalgamation.cpp"
 	"sys_ded.cpp"
