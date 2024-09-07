@@ -1,6 +1,6 @@
 add_library(steam_api SHARED IMPORTED)
 
-target_include_directories(steam_api INTERFACE ${BASEDIR}/thirdparty/steam)
+target_include_directories(steam_api INTERFACE ${BASEDIR}/src/public/steam)
 
 if (WIN32)
 	set_target_properties(steam_api PROPERTIES IMPORTED_IMPLIB "${BASEDIR}/lib/public/steam_api.lib")
@@ -8,11 +8,18 @@ else()
 	set_target_properties(steam_api PROPERTIES IMPORTED_IMPLIB "${BASEDIR}/lib/public/linux/libsteam_api.so")
 endif()
 
+add_library(rehlds SHARED)
+
 set_common_properties(rehlds)
 
 target_link_libraries(rehlds PRIVATE
 	$<$<PLATFORM_ID:Windows>:ws2_32>
 	$<$<PLATFORM_ID:Windows>:psapi>
+	$<$<PLATFORM_ID:Linux>:dl>
+	$<$<PLATFORM_ID:Linux>:rt>
+	$<$<PLATFORM_ID:Linux>:m>
+	$<$<PLATFORM_ID:Linux>:aelf32>
+	steam_api
 )
 
 # Include directories
@@ -39,14 +46,6 @@ target_compile_definitions(rehlds PRIVATE
 set_target_properties(rehlds PROPERTIES OUTPUT_NAME "swds")
 if (UNIX)
 	set_target_properties(rehlds PROPERTIES OUTPUT_NAME "engine_i486")
-
-	target_compiler_definitions(rehlds PRIVATE
-		_stricmp=strcasecmp
-		_strnicmp=strncasecmp
-		_strdup=strdup
-		_vsnprintf=vsnprintf
-		_unlink=unlink
-	)
 endif(UNIX)
 
 ################################################################################

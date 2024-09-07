@@ -1,7 +1,10 @@
+add_library(filesystem SHARED)
+
 set_common_properties(filesystem)
 
 target_link_libraries(filesystem PRIVATE
 	$<$<PLATFORM_ID:Windows>:psapi>
+	$<$<PLATFORM_ID:Linux>:dl>
 )
 
 # Include directories
@@ -12,15 +15,6 @@ target_include_directories(filesystem PRIVATE
 	${BASEDIR}/src/public
 	${BASEDIR}/src/public/rehlds
 )
-
-if (UNIX)
-	target_compiler_definitions(filesystem PRIVATE
-		_stricmp=strcasecmp
-		_strnicmp=strncasecmp
-		_strdup=strdup
-		_vsnprintf=vsnprintf
-	)
-endif(UNIX)
 
 ################################################################################
 # Source groups
@@ -35,8 +29,8 @@ set(Source_Files
 	"filesystem_helpers.cpp"
 	"FileSystem_Stdio.cpp"
 	"public_amalgamation.cpp"
-	$<$<PLATFORM_ID:Linux>:"linux_support.cpp">
-	$<$<PLATFORM_ID:Linux>:"pathmatch.cpp">
+	$<$<PLATFORM_ID:Linux>:"./linux_support.cpp">
+	$<$<PLATFORM_ID:Linux>:"./pathmatch.cpp">
 )
 source_group("Source Files" FILES ${Source_Files})
 
@@ -45,7 +39,7 @@ set(Header_Files
 	"filesystem_helpers.h"
 	"FileSystem_Stdio.h"
 	"precompiled.h"
-	$<$<PLATFORM_ID:Linux>:"linux_support.h">
+	$<$<PLATFORM_ID:Linux>:"./linux_support.h">
 )
 source_group("Header Files" FILES ${Header_Files})
 

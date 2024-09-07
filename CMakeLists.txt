@@ -44,10 +44,26 @@ function(set_common_properties TARGET_NAME)
 	# Compile Flags and such.
 	set_target_properties(${TARGET_NAME} PROPERTIES PREFIX "")
 
+	if (UNIX)
+		target_compiler_definitions(${TARGET_NAME} PRIVATE
+			_stricmp=strcasecmp
+			_strnicmp=strncasecmp
+			_strdup=strdup
+			_vsnprintf=vsnprintf
+			_unlink=unlink)
+	endif(UNIX)
+
+	# Disable C++ exceptions, which is enabled by default with CMake?
+	if (MSVC)
+		target_compile_options(${TARGET_NAME} PUBLIC /EHs-c-)
+	else()
+		target_compile_options(${TARGET_NAME} PUBLIC -fno-exceptions)
+	endif()
+
 	target_compile_definitions(${TARGET_NAME} PRIVATE
 			_CRT_SECURE_NO_WARNINGS
 			$<$<CONFIG:DEBUG>:_DEBUG>
-			$<$<PLATFORM_ID:Linux>:POSIX _POSIX LINUX _LINUX GNUC>)
+			$<$<PLATFORM_ID:Linux>:POSIX _POSIX LINUX _LINUX GNUC _GLIBCXX_USE_CXX11_ABI=0>)
 
 	target_compile_options(${TARGET_NAME} PRIVATE
 			# force 387 for FP math so the precision between win32 and linux and osx match
@@ -92,15 +108,15 @@ endfunction(set_common_properties)
 add_compile_definitions($<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Debug>:_DEBUG>)
 add_compile_definitions($<$<CONFIG:Release>:NDEBUG>)
 
-add_subdirectory(src/hlds)
 add_subdirectory(src/rehlds)
+add_subdirectory(src/dedicated)
 add_subdirectory(src/filesystem)
 add_subdirectory(utils/bzip2)
 
 # Set Visual Studio starting project
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT hlds)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT rehlds)
 
-set_target_properties(hlds PROPERTIES 
+set_target_properties(dedicated PROPERTIES 
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bins/debug
 	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bins/release)
 
