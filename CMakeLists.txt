@@ -10,7 +10,7 @@ if (MSVC)
 	set(CMAKE_SYSTEM_VERSION 10.0)
 endif()
 
-project(msr LANGUAGES CXX)
+project(msr_engine LANGUAGES CXX C)
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
@@ -92,16 +92,26 @@ endfunction(set_common_properties)
 add_compile_definitions($<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Debug>:_DEBUG>)
 add_compile_definitions($<$<CONFIG:Release>:NDEBUG>)
 
-add_subdirectory(src/game/client)
-add_subdirectory(src/game/server)
+add_subdirectory(src/hlds)
+add_subdirectory(src/rehlds)
+add_subdirectory(src/filesystem)
+add_subdirectory(utils/bzip2)
 
 # Set Visual Studio starting project
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT client)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT hlds)
 
-set_target_properties(client PROPERTIES 
+set_target_properties(hlds PROPERTIES 
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bins/debug
 	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bins/release)
 
-set_target_properties(server PROPERTIES 
+set_target_properties(rehlds PROPERTIES 
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bins/debug
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bins/release)
+
+set_target_properties(filesystem PROPERTIES 
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bins/debug
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bins/release)
+
+set_target_properties(bzip2 PROPERTIES 
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bins/debug
 	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bins/release)
