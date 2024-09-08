@@ -2,9 +2,9 @@
 # Source groups
 ################################################################################
 set(Resources
-	$<$<PLATFORM_ID:Windows>:"./icon.ico">
-	$<$<PLATFORM_ID:Windows>:"./resource.h">
-	$<$<PLATFORM_ID:Windows>:"./dedicated.rc">
+	$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/icon.ico>
+	$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/resource.h>
+	$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/dedicated.rc>
 )
 source_group("Resources" FILES ${Resources})
 
@@ -21,11 +21,11 @@ set(Source_Files
 	"public_amalgamation.cpp"
 	"sys_ded.cpp"
 	"sys_ded.h"
-	$<$<PLATFORM_ID:Windows>:"./sys_window.cpp">
-	$<$<PLATFORM_ID:Windows>:"./conproc.cpp">
-	$<$<PLATFORM_ID:Windows>:"./conproc.h">
-	$<$<PLATFORM_ID:Linux>:"./sys_linux.cpp">
-	$<$<PLATFORM_ID:Linux>:"./dbg.cpp">
+	$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/sys_window.cpp>
+	$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/conproc.cpp>
+	$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/conproc.h>
+	$<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_SOURCE_DIR}/sys_linux.cpp>
+	$<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_SOURCE_DIR}/dbg.cpp>
 )
 source_group("Source Files" FILES ${Source_Files})
 
@@ -81,6 +81,7 @@ target_link_libraries(dedicated PRIVATE
 # Include directories
 target_include_directories(dedicated PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}
+	${BASEDIR}/src
 	${BASEDIR}/src/common
 	${BASEDIR}/src/engine
 	${BASEDIR}/src/public

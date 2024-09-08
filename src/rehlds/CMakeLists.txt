@@ -10,6 +10,10 @@ endif()
 
 add_library(rehlds SHARED)
 
+add_dependencies(rehlds
+	bzip2
+)
+
 set_common_properties(rehlds)
 
 target_link_libraries(rehlds PRIVATE
@@ -25,10 +29,13 @@ target_link_libraries(rehlds PRIVATE
 # Include directories
 target_include_directories(rehlds PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}
+	${BASEDIR}/src
 	${BASEDIR}/src/common
 	${BASEDIR}/src/engine
+	${BASEDIR}/src/movement
 	${BASEDIR}/src/public
 	${BASEDIR}/src/public/rehlds
+	${BASEDIR}/utils
 )
 
 target_compile_definitions(rehlds PRIVATE
@@ -404,10 +411,6 @@ set(ALL_FILES
 	${Public_ReHLDS}
 	${Public_Steam}
 	${Public_tier0}
-)
-
-add_dependencies(rehlds
-	bzip2
 )
 
 target_sources(rehlds PRIVATE ${ALL_FILES})
