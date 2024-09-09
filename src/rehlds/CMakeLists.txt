@@ -1,9 +1,11 @@
 add_library(steam_api SHARED IMPORTED)
+add_library(libacof32 SHARED IMPORTED)
 
 target_include_directories(steam_api INTERFACE ${BASEDIR}/src/public/steam)
 
 if (WIN32)
 	set_target_properties(steam_api PROPERTIES IMPORTED_IMPLIB "${BASEDIR}/lib/public/steam_api.lib")
+	set_target_properties(libacof32 PROPERTIES IMPORTED_IMPLIB "${BASEDIR}/lib/public/libacof32.lib")
 else()
 	set_target_properties(steam_api PROPERTIES IMPORTED_IMPLIB "${BASEDIR}/lib/public/linux/libsteam_api.so")
 endif()
@@ -24,6 +26,7 @@ target_link_libraries(rehlds PRIVATE
 	$<$<PLATFORM_ID:Linux>:m>
 	$<$<PLATFORM_ID:Linux>:aelf32>
 	steam_api
+	libacof32
 )
 
 # Include directories
@@ -68,7 +71,6 @@ set(Source_Files
 	"main.cpp"
 	"platform.cpp"
 	"platform.h"
-	"precompiled.h"
 	"rehlds_interfaces_impl.cpp"
 	"rehlds_interfaces_impl.h"
 	"rehlds_security.cpp"
@@ -413,4 +415,6 @@ set(ALL_FILES
 	${Public_tier0}
 )
 
+target_precompile_headers(rehlds PRIVATE 
+	"./precompiled.h")
 target_sources(rehlds PRIVATE ${ALL_FILES})
