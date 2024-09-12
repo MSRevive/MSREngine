@@ -1,4 +1,4 @@
-add_library(bzip2 SHARED)
+add_library(bzip2 STATIC)
 
 ################################################################################
 # Source groups

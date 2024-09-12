@@ -27,6 +27,7 @@ target_link_libraries(rehlds PRIVATE
 	$<$<PLATFORM_ID:Linux>:aelf32>
 	steam_api
 	libacof32
+	bzip2
 )
 
 # Include directories
@@ -39,6 +40,7 @@ target_include_directories(rehlds PRIVATE
 	${BASEDIR}/src/public
 	${BASEDIR}/src/public/rehlds
 	${BASEDIR}/utils
+	bzip2
 )
 
 target_compile_definitions(rehlds PRIVATE
