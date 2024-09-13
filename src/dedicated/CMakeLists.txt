@@ -1,3 +1,46 @@
+if(WIN32)
+	add_executable(dedicated WIN32)
+else()
+	add_executable(dedicated)
+endif()
+
+################################################################################
+# Target Properties
+################################################################################
+# if(MSVC)
+# 	target_compile_options(dedicated PUBLIC /arch:SSE2)
+# else()
+# 	target_compile_options(dedicated PUBLIC -msse2)
+# endif()
+
+set_common_properties(dedicated)
+
+target_link_libraries(dedicated PRIVATE
+	$<$<PLATFORM_ID:Windows>:ws2_32>
+	$<$<PLATFORM_ID:Windows>:winmm>
+	$<$<PLATFORM_ID:Linux>:dl>
+)
+
+# Include directories
+target_include_directories(dedicated PRIVATE
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${BASEDIR}/src
+	${BASEDIR}/src/common
+	${BASEDIR}/src/engine
+	${BASEDIR}/src/public
+	${BASEDIR}/src/public/rehlds
+)
+
+target_compile_definitions(dedicated PRIVATE
+	LAUNCHER_FIXES
+	DEDICATED
+	_CONSOLE
+)
+
+if (UNIX)
+	set_target_properties(dedicated PROPERTIES OUTPUT_NAME "hlds_linux")
+endif(UNIX)
+
 ################################################################################
 # Source groups
 ################################################################################
@@ -64,38 +107,5 @@ set(ALL_FILES
 	${Engine}
 	${VGUI}
 )
-
-add_executable(dedicated ${ALL_FILES})
-
-################################################################################
-# Target Properties
-################################################################################
-set_common_properties(dedicated)
-
-target_link_libraries(dedicated PRIVATE
-	$<$<PLATFORM_ID:Windows>:ws2_32>
-	$<$<PLATFORM_ID:Windows>:winmm>
-	$<$<PLATFORM_ID:Linux>:dl>
-)
-
-# Include directories
-target_include_directories(dedicated PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}
-	${BASEDIR}/src
-	${BASEDIR}/src/common
-	${BASEDIR}/src/engine
-	${BASEDIR}/src/public
-	${BASEDIR}/src/public/rehlds
-)
-
-target_compile_definitions(dedicated PRIVATE
-	LAUNCHER_FIXES
-	DEDICATED
-	_CONSOLE
-)
-
-if (UNIX)
-	set_target_properties(dedicated PROPERTIES OUTPUT_NAME "hlds_linux")
-endif(UNIX)
 
 target_sources(dedicated PRIVATE ${ALL_FILES})
