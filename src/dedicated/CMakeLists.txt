@@ -35,8 +35,15 @@ target_compile_definitions(dedicated PRIVATE
 	LAUNCHER_FIXES
 	DEDICATED
 	_CONSOLE
+	VERSION_SAFE_STEAM_API_INTERFACES
 )
 
+set_target_properties(dedicated PROPERTIES 
+	OUTPUT_NAME "hlds"
+	VS_DEBUGGER_WORKING_DIRECTORY ${VS_DEBUG_WORK_DIR}
+	VS_DEBUGGER_COMMAND ${VS_DEBUG_WORK_DIR}/hlds.exe
+	VS_DEBUGGER_COMMAND_ARGUMENTS ${VS_DEBUG_CMD_ARGS}
+)
 if (UNIX)
 	set_target_properties(dedicated PROPERTIES OUTPUT_NAME "hlds_linux")
 endif(UNIX)

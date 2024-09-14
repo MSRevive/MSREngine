@@ -30,6 +30,11 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
 endif()
 
+if(MSVC)
+	set(VS_DEBUG_WORK_DIR "" CACHE PATH "Set working directory for VS Debug. This should be the directory where your MSRebirth test server is.")
+	set(VS_DEBUG_CMD_ARGS "" CACHE STRING "The arguements to start the program with.")
+endif()
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Modern VS versions default to C++14 anyway, so make it consistent
@@ -55,13 +60,14 @@ function(set_common_properties TARGET_NAME)
 
 	# Disable C++ exceptions, which is enabled by default with CMake?
 	if (MSVC)
-		target_compile_options(${TARGET_NAME} PUBLIC /EHs-c-)
+		target_compile_options(${TARGET_NAME} PUBLIC /EHsc)
 	else()
 		target_compile_options(${TARGET_NAME} PUBLIC -fno-exceptions)
 	endif()
 
 	target_compile_definitions(${TARGET_NAME} PRIVATE
 			_CRT_SECURE_NO_WARNINGS
+			USE_BREAKPAD_HANDLER
 			$<$<CONFIG:DEBUG>:_DEBUG>
 			$<$<PLATFORM_ID:Linux>:POSIX _POSIX LINUX _LINUX GNUC _GLIBCXX_USE_CXX11_ABI=0>)
 
@@ -108,13 +114,10 @@ endfunction(set_common_properties)
 add_compile_definitions($<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Debug>:_DEBUG>)
 add_compile_definitions($<$<CONFIG:Release>:NDEBUG>)
 
-add_subdirectory(src/rehlds)
 add_subdirectory(src/dedicated)
+add_subdirectory(src/rehlds)
 add_subdirectory(src/filesystem)
 add_subdirectory(utils/bzip2)
-
-# Set Visual Studio starting project
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT rehlds)
 
 set_target_properties(dedicated PROPERTIES 
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bins/debug
@@ -127,3 +130,9 @@ set_target_properties(rehlds PROPERTIES
 set_target_properties(filesystem PROPERTIES 
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bins/debug
 	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bins/release)
+
+# Set Visual Studio starting project.
+# However it doesn't change if the project was already generated even if you clear the CMake cache. THANKS MICROSOFT
+if(MSVC)
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT dedicated)
+endif()
