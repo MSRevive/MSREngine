@@ -55,7 +55,7 @@ function(set_common_properties TARGET_NAME)
 
 	# Disable C++ exceptions, which is enabled by default with CMake?
 	if (MSVC)
-		target_compile_options(${TARGET_NAME} PUBLIC /EHsc)
+		target_compile_options(${TARGET_NAME} PUBLIC /EHs-c-)
 	else()
 		target_compile_options(${TARGET_NAME} PUBLIC -fno-exceptions)
 	endif()
