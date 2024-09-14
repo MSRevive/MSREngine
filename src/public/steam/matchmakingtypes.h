@@ -113,12 +113,12 @@ inline void	servernetadr_t::Init( unsigned int ip, uint16 usQueryPort, uint16 us
 	m_usConnectionPort = usConnectionPort;
 }
 
-#ifdef NETADR_H
-inline netadr_t servernetadr_t::GetIPAndQueryPort()
-{
-	return netadr_t( m_unIP, m_usQueryPort );
-}
-#endif
+//#ifdef NETADR_H
+//inline netadr_t servernetadr_t::GetIPAndQueryPort()
+//{
+//	return netadr_t( m_unIP, m_usQueryPort );
+//}
+//#endif
 
 inline uint16 servernetadr_t::GetQueryPort() const
 {
