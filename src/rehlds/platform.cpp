@@ -68,7 +68,7 @@ BOOL CSimplePlatform::QueryPerfFreq(LARGE_INTEGER* freq) {
 }
 
 DWORD CSimplePlatform::GetTickCount() {
-	return ::GetTickCount();
+	return ::GetTickCount64();
 }
 
 void CSimplePlatform::GetLocalTime(LPSYSTEMTIME time) {
