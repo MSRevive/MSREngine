@@ -150,11 +150,11 @@ int CSimplePlatform::WSAGetLastError() {
 
 #endif //WIN32
 void CSimplePlatform::SteamAPI_SetBreakpadAppID(uint32 unAppID) {
-	return SteamAPI_SetBreakpadAppID(unAppID);
+	return ::SteamAPI_SetBreakpadAppID(unAppID);
 }
 
 void CSimplePlatform::SteamAPI_UseBreakpadCrashHandler(char const *pchVersion, char const *pchDate, char const *pchTime, bool bFullMemoryDumps, void *pvContext, PFNPreMinidumpCallback m_pfnPreMinidumpCallback) {
-	SteamAPI_UseBreakpadCrashHandler(pchVersion, pchDate, pchTime, bFullMemoryDumps, pvContext, m_pfnPreMinidumpCallback);
+	::SteamAPI_UseBreakpadCrashHandler(pchVersion, pchDate, pchTime, bFullMemoryDumps, pvContext, m_pfnPreMinidumpCallback);
 }
 
 void CSimplePlatform::SteamAPI_RegisterCallback(CCallbackBase *pCallback, int iCallback) {
