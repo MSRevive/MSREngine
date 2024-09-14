@@ -16,6 +16,9 @@ add_dependencies(rehlds
 	bzip2
 )
 
+target_precompile_headers(rehlds PRIVATE 
+	${CMAKE_CURRENT_SOURCE_DIR}/precompiled.h)
+
 set_common_properties(rehlds)
 
 target_link_libraries(rehlds PRIVATE
@@ -44,8 +47,9 @@ target_include_directories(rehlds PRIVATE
 )
 
 target_compile_definitions(rehlds PRIVATE
+	REHLDS_API
+	REHLDS_FLIGHT_REC
 	REHLDS_FIXES
-	VERSION_SAFE_STEAM_API_INTERFACES
 	REHLDS_SSE
 	REHLDS_OPT_PEDANTIC
 	REHLDS_SELF
@@ -53,6 +57,7 @@ target_compile_definitions(rehlds PRIVATE
 	HAVE_OPT_STRTOOLS
 	DEDICATED
 	SWDS
+	VERSION_SAFE_STEAM_API_INTERFACES
 )
 
 set_target_properties(rehlds PROPERTIES OUTPUT_NAME "swds")
@@ -369,32 +374,6 @@ set(Public_ReHLDS
 )
 source_group("Public\\ReHLDS" FILES ${Public_ReHLDS})
 
-set(Public_Steam
-	"../public/steam/isteamapps.h"
-	"../public/steam/isteambilling.h"
-	"../public/steam/isteamclient.h"
-	"../public/steam/isteamcontroller.h"
-	"../public/steam/isteamfriends.h"
-	"../public/steam/isteamgameserver.h"
-	"../public/steam/isteamgameserverstats.h"
-	"../public/steam/isteamhttp.h"
-	"../public/steam/isteammatchmaking.h"
-	"../public/steam/isteamnetworking.h"
-	"../public/steam/isteamremotestorage.h"
-	"../public/steam/isteamscreenshots.h"
-	"../public/steam/isteamunifiedmessages.h"
-	"../public/steam/isteamuser.h"
-	"../public/steam/isteamuserstats.h"
-	"../public/steam/isteamutils.h"
-	"../public/steam/matchmakingtypes.h"
-	"../public/steam/steam_api.h"
-	"../public/steam/steam_gameserver.h"
-	"../public/steam/steamclientpublic.h"
-	"../public/steam/steamhttpenums.h"
-	"../public/steam/steamtypes.h"
-)
-source_group("Public\\Steam" FILES ${Public_Steam})
-
 set(Public_tier0
 	"../public/tier0/dbg.cpp"
 	"../public/tier0/dbg.h"
@@ -413,10 +392,7 @@ set(ALL_FILES
 	${Engine_Server}
 	${Public}
 	${Public_ReHLDS}
-	${Public_Steam}
 	${Public_tier0}
 )
 
-target_precompile_headers(rehlds PRIVATE 
-	"./precompiled.h")
 target_sources(rehlds PRIVATE ${ALL_FILES})
