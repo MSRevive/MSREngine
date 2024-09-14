@@ -1,4 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+//========= Copyright © 1996-2008, Valve LLC, All rights reserved. ============
 //
 // Purpose:
 //
@@ -9,6 +9,8 @@
 #ifdef _WIN32
 #pragma once
 #endif
+
+#define S_CALLTYPE __cdecl
 
 // Steam-specific types. Defined here so this header file can be included in other code bases.
 #ifndef WCHARTYPES_H
@@ -31,27 +33,26 @@ typedef unsigned char uint8;
 #define VALVE_BIG_ENDIAN
 #endif
 
-#if defined( _WIN32 )
-
-#ifdef X64BITS
-typedef __int64 intp;				// intp is an integer that can accomodate a pointer
-typedef unsigned __int64 uintp;		// (ie, sizeof(intp) >= sizeof(int) && sizeof(intp) >= sizeof(void *)
+#ifdef API_GEN
+# define CLANG_ATTR(ATTR) __attribute__((annotate( ATTR )))
 #else
-typedef __int32 intp;
-typedef unsigned __int32 uintp;
+# define CLANG_ATTR(ATTR)
 #endif
 
-#else // _WIN32
-
-#ifdef X64BITS
-typedef long long intp;
-typedef unsigned long long uintp;
-#else
-typedef int intp;
-typedef unsigned int uintp;
-#endif
-
-#endif // else _WIN32
+#define METHOD_DESC(DESC) CLANG_ATTR( "desc:" #DESC ";" )
+#define IGNOREATTR() CLANG_ATTR( "ignore" )
+#define OUT_STRUCT() CLANG_ATTR( "out_struct: ;" )
+#define OUT_STRING() CLANG_ATTR( "out_string: ;" )
+#define OUT_ARRAY_CALL(COUNTER,FUNCTION,PARAMS) CLANG_ATTR( "out_array_call:" #COUNTER "," #FUNCTION "," #PARAMS ";" )
+#define OUT_ARRAY_COUNT(COUNTER, DESC) CLANG_ATTR( "out_array_count:" #COUNTER  ";desc:" #DESC )
+#define ARRAY_COUNT(COUNTER) CLANG_ATTR( "array_count:" #COUNTER ";" )
+#define ARRAY_COUNT_D(COUNTER, DESC) CLANG_ATTR( "array_count:" #COUNTER ";desc:" #DESC )
+#define BUFFER_COUNT(COUNTER) CLANG_ATTR( "buffer_count:" #COUNTER ";" )
+#define OUT_BUFFER_COUNT(COUNTER) CLANG_ATTR( "out_buffer_count:" #COUNTER ";" )
+#define OUT_STRING_COUNT(COUNTER) CLANG_ATTR( "out_string_count:" #COUNTER ";" )
+#define DESC(DESC) CLANG_ATTR("desc:" #DESC ";")
+#define CALL_RESULT(RESULT_TYPE) CLANG_ATTR("callresult:" #RESULT_TYPE ";")
+#define CALL_BACK(RESULT_TYPE) CLANG_ATTR("callback:" #RESULT_TYPE ";")
 
 const int k_cubSaltSize   = 8;
 typedef	uint8 Salt_t[ k_cubSaltSize ];
@@ -67,12 +68,13 @@ typedef uint64 GID_t;
 const GID_t k_GIDNil = 0xffffffffffffffffull;
 
 // For convenience, we define a number of types that are just new names for GIDs
-typedef GID_t JobID_t;			// Each Job has a unique ID
+typedef uint64 JobID_t;			// Each Job has a unique ID
 typedef GID_t TxnID_t;			// Each financial transaction has a unique ID
 
 const GID_t k_TxnIDNil = k_GIDNil;
 const GID_t k_TxnIDUnknown = 0;
 
+const JobID_t k_JobIDNil = 0xffffffffffffffffull;
 
 // this is baked into client messages and interfaces as an int, 
 // make sure we never break this.
@@ -80,6 +82,8 @@ typedef uint32 PackageId_t;
 const PackageId_t k_uPackageIdFreeSub = 0x0;
 const PackageId_t k_uPackageIdInvalid = 0xFFFFFFFF;
 
+typedef uint32 BundleId_t;
+const BundleId_t k_uBundleIdInvalid = 0;
 
 // this is baked into client messages and interfaces as an int, 
 // make sure we never break this.
@@ -116,5 +120,11 @@ typedef uint32 AccountID_t;
 
 typedef uint32 PartnerId_t;
 const PartnerId_t k_uPartnerIdInvalid = 0;
+
+// ID for a depot content manifest
+typedef uint64 ManifestId_t; 
+const ManifestId_t k_uManifestIdInvalid = 0;
+
+
 
 #endif // STEAMTYPES_H

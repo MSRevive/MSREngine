@@ -54,7 +54,8 @@ bool StartupSteamServer(uint32 unIP, uint16 usSteamPort, uint16 usGamePort, uint
 {
 	SteamAPI_SetTryCatchCallbacks(false);
 	s_SteamGameServerAPIContext.Clear();
-	const bool res = SteamGameServer_InitSafe(unIP, usSteamPort, usGamePort, usQueryPort, eServerMode, pchVersionString);
+	//const bool res = SteamGameServer_InitSafe(unIP, usSteamPort, usGamePort, usQueryPort, eServerMode, pchVersionString);
+	const bool res = SteamGameServer_Init(unIP, usSteamPort, usGamePort, usQueryPort, eServerMode, pchVersionString);
 	s_SteamGameServerAPIContext.Init();
 	return res;
 }
