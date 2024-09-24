@@ -58,13 +58,6 @@ function(set_common_properties TARGET_NAME)
 			_unlink=unlink)
 	endif(UNIX)
 
-	# Disable C++ exceptions, which is enabled by default with CMake?
-	if (MSVC)
-		target_compile_options(${TARGET_NAME} PUBLIC /EHsc)
-	else()
-		target_compile_options(${TARGET_NAME} PUBLIC -fno-exceptions)
-	endif()
-
 	target_compile_definitions(${TARGET_NAME} PRIVATE
 			_CRT_SECURE_NO_WARNINGS
 			USE_BREAKPAD_HANDLER
@@ -76,7 +69,7 @@ function(set_common_properties TARGET_NAME)
 			# Note: the pentium-m arch setting is not used for AMD systems in the original makefile
 			# Since the arch settings used are i686 this means including the setting ensures original settings are used,
 			# but it could cause problems for AMD targets
-			$<$<CXX_COMPILER_ID:GNU>:-fpermissive -fno-strict-aliasing -Wno-invalid-offsetof -march=pentium-m -mfpmath=387>
+			$<$<CXX_COMPILER_ID:GNU>:-fpermissive -fno-strict-aliasing -Wno-invalid-offsetof -march=pentium-m -mfpmath=387 --fno-exceptions>
 			
 			# flifetime-dse=1 is needed to disable a compiler optimization that optimizes out std::memset calls in CBaseEntity::operator new
 			# See https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-flifetime-dse for more information about this flag
